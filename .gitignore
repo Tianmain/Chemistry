@@ -1,0 +1,48 @@
+# Unity generated files
+Library/
+Temp/
+Logs/
+UserSettings/
+MemoryCaptures/
+
+# Visual Studio / MonoDevelop / Rider generated files
+obj/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.ideaconfig
+*.vsconfig
+
+# VSCode settings
+.vscode/
+
+# Visual Studio settings
+.vs/
+*.rsuser
+
+# Rider settings
+.idea/
+
+# Build outputs
+Build/
+Builds/
+*.apk
+*.aab
+*.unitypackage
+
+# Unity metadata
+*.pidb.meta
+*.pdb.meta
+
+# OS metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Asset meta data should generally be included, but large binary files should use Git LFS
+# See: https://docs.unity3d.com/Manual/ExternalVersionControlSystemSupport.html

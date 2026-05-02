@@ -1,0 +1,162 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b5bac64c6a03e6408b56587b24ed0c5, type: 3}
+  m_Name: LocalizationData
+  m_EditorClassIdentifier: 
+  entries:
+  - key: btn_settings
+    englishText: Settings
+    chineseText: "\u8BBE\u7F6E"
+  - key: btn_help
+    englishText: Help
+    chineseText: "\u5E2E\u52A9"
+  - key: btn_about
+    englishText: About
+    chineseText: "\u5173\u4E8E"
+  - key: text_language
+    englishText: Language
+    chineseText: "\u8BED\u8A00"
+  - key: text_rotationspeed
+    englishText: RotationSpeed
+    chineseText: "\u65CB\u8F6C\u901F\u5EA6"
+  - key: text_movespeed
+    englishText: MoveSpeed
+    chineseText: "\u5E73\u79FB\u901F\u5EA6"
+  - key: text_zoomspeed
+    englishText: ZoomSpeed
+    chineseText: "\u7F29\u653E\u901F\u5EA6"
+  - key: current_element
+    englishText: 'Current Element: {0} ({1})'
+    chineseText: "\u5F53\u524D\u5143\u7D20\uFF1A{0} ({1})"
+  - key: current_element_empty
+    englishText: 'Current Element: None'
+    chineseText: "\u5F53\u524D\u5143\u7D20\uFF1A\u65E0"
+  - key: keymap_title
+    englishText: 'Key Bindings:'
+    chineseText: "\u952E\u4F4D\u6620\u5C04\uFF1A"
+  - key: keymap_hydrogen
+    englishText: H (Hydrogen) - H
+    chineseText: "H (\u6C22) - H"
+  - key: keymap_lithium
+    englishText: Li (Lithium) - L
+    chineseText: "Li (\u9502) - L"
+  - key: keymap_carbon
+    englishText: C (Carbon) - C
+    chineseText: "C (\u78B3) - C"
+  - key: keymap_nitrogen
+    englishText: N (Nitrogen) - N
+    chineseText: "N (\u6C2E) - N"
+  - key: keymap_oxygen
+    englishText: O (Oxygen) - O
+    chineseText: "O (\u6C27) - O"
+  - key: keymap_fluorine
+    englishText: F (Fluorine) - F
+    chineseText: "F (\u6C1F) - F"
+  - key: keymap_sodium
+    englishText: Na (Sodium) - A
+    chineseText: "Na (\u94A0) - A"
+  - key: keymap_magnesium
+    englishText: Mg (Magnesium) - G
+    chineseText: "Mg (\u9541) - G"
+  - key: keymap_aluminum
+    englishText: Al (Aluminum) - P
+    chineseText: "Al (\u94DD) - P"
+  - key: keymap_silicon
+    englishText: Si (Silicon) - S
+    chineseText: "Si (\u7845) - S"
+  - key: keymap_phosphorus
+    englishText: P (Phosphorus) - D
+    chineseText: "P (\u78F7) - D"
+  - key: keymap_sulfur
+    englishText: S (Sulfur) - U
+    chineseText: "S (\u786B) - U"
+  - key: keymap_chlorine
+    englishText: Cl (Chlorine) - Z
+    chineseText: "Cl (\u6C2F) - Z"
+  - key: keymap_potassium
+    englishText: K (Potassium) - K
+    chineseText: "K (\u94BE) - K"
+  - key: keymap_calcium
+    englishText: Ca (Calcium) - B
+    chineseText: "Ca (\u9499) - B"
+  - key: element_hydrogen
+    englishText: Hydrogen
+    chineseText: "\u6C22"
+  - key: element_lithium
+    englishText: Lithium
+    chineseText: "\u9502"
+  - key: element_carbon
+    englishText: Carbon
+    chineseText: "\u78B3"
+  - key: element_nitrogen
+    englishText: Nitrogen
+    chineseText: "\u6C2E"
+  - key: element_oxygen
+    englishText: Oxygen
+    chineseText: "\u6C27"
+  - key: element_fluorine
+    englishText: Fluorine
+    chineseText: "\u6C1F"
+  - key: element_sodium
+    englishText: Sodium
+    chineseText: "\u94A0"
+  - key: element_magnesium
+    englishText: Magnesium
+    chineseText: "\u9541"
+  - key: element_aluminum
+    englishText: Aluminum
+    chineseText: "\u94DD"
+  - key: element_silicon
+    englishText: Silicon
+    chineseText: "\u7845"
+  - key: element_phosphorus
+    englishText: Phosphorus
+    chineseText: "\u78F7"
+  - key: element_sulfur
+    englishText: Sulfur
+    chineseText: "\u786B"
+  - key: element_chlorine
+    englishText: Chlorine
+    chineseText: "\u6C2F"
+  - key: element_potassium
+    englishText: Potassium
+    chineseText: "\u94BE"
+  - key: element_calcium
+    englishText: Calcium
+    chineseText: "\u9499"
+  - key: text_settings
+    englishText: Settings
+    chineseText: "\u8BBE\u7F6E"
+  - key: selected_info
+    englishText: 'Selected: {0}'
+    chineseText: "\u5F53\u524D\u9009\u4E2D\uFF1A{0}"
+  - key: bond_type_info
+    englishText: 'Bond Type: {0}'
+    chineseText: "\u952E\u7C7B\u578B\uFF1A{0}"
+  - key: btn_rotate
+    englishText: Rotate Bond
+    chineseText: "\u65CB\u8F6C\u952E"
+  - key: btn_stop_rotate
+    englishText: Stop Rotation
+    chineseText: "\u505C\u6B62\u65CB\u8F6C"
+  - key: text_rotation_angle
+    englishText: 'Rotation: {0}'
+    chineseText: "\u65CB\u8F6C\u89D2\u5ea6\uFF1A{0}"
+  - key: hint_rotation_mode
+    englishText: 'Rotation Mode: Press Q/E or drag to rotate, R/ESC to exit'
+    chineseText: "\u65cb\u8f6c\u6a21\u5f0f\uff1a\u6309 Q/E \u65cb\u8f6c\u6216\u53f3\u952e\u62d6\u62fd\uff0cR/ESC \u9000\u51fa"
+  - key: text_rotation_panel
+    englishText: Bond Rotation
+    chineseText: "\u952E\u65CB\u8F6C\u63A7\u5236"
+  - key: btn_reset_rotation
+    englishText: Reset
+    chineseText: "\u91CD\u7F6E"

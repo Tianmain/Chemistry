@@ -1,0 +1,29 @@
+fileFormatVersion: 2
+guid: 95335eaf6944c9b4e94e7b271e837aa6
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - hydrogen: {instanceID: 0}
+  - lithium: {instanceID: 0}
+  - carbon: {instanceID: 0}
+  - nitrogen: {instanceID: 0}
+  - oxygen: {instanceID: 0}
+  - fluorine: {instanceID: 0}
+  - sodium: {instanceID: 0}
+  - magnesium: {instanceID: 0}
+  - aluminum: {instanceID: 0}
+  - silicon: {instanceID: 0}
+  - phosphorus: {instanceID: 0}
+  - sulfur: {instanceID: 0}
+  - chlorine: {instanceID: 0}
+  - potassium: {instanceID: 0}
+  - calcium: {instanceID: 0}
+  - bondMaterial: {instanceID: 0}
+  - dashedBondMaterial: {fileID: 2100000, guid: caaf2c72888011b4291c49273e9ce52d, type: 2}
+  - highlightedMaterial: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

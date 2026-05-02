@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95335eaf6944c9b4e94e7b271e837aa6, type: 3}
+  m_Name: MaterialManager
+  m_EditorClassIdentifier: 
+  hydrogen: {fileID: 2100000, guid: efe51a0798ea9b241a4053f768affa03, type: 2}
+  lithium: {fileID: 2100000, guid: f3d037773df3b1e459298a78a496b669, type: 2}
+  carbon: {fileID: 2100000, guid: 8d23b58988821784aa507de894a77505, type: 2}
+  nitrogen: {fileID: 2100000, guid: e75ae8ec098ccc94d916350f18a99fc0, type: 2}
+  oxygen: {fileID: 2100000, guid: df84a1d391e10774b816de04c1f5e95b, type: 2}
+  fluorine: {fileID: 2100000, guid: c78c8a3ee9a604c4abde10ee042f6cce, type: 2}
+  sodium: {fileID: 2100000, guid: b897ec9ae7919504891edfc8233897e9, type: 2}
+  magnesium: {fileID: 2100000, guid: ed08b87d170291e4587314ee39212fde, type: 2}
+  aluminum: {fileID: 2100000, guid: 4a80ede83bd649e4c897356ae5ac89e8, type: 2}
+  silicon: {fileID: 2100000, guid: fe1d4384f17d86c45bfd984b4e6971d8, type: 2}
+  phosphorus: {fileID: 2100000, guid: 5a814fada304b6b4a9ad07a28bc5e433, type: 2}
+  sulfur: {fileID: 2100000, guid: b897ec9ae7919504891edfc8233897e9, type: 2}
+  chlorine: {fileID: 2100000, guid: 2625f8b0ca47c654ca36cf230f687cf7, type: 2}
+  potassium: {fileID: 2100000, guid: b15ce5d3a230172499d3c1102fd02006, type: 2}
+  calcium: {fileID: 2100000, guid: 860b299d0160c704f8d33de10c385bec, type: 2}
+  highlightedMaterial: {fileID: 2100000, guid: 942eec8486c30f34b9fb4c3e46cf5034, type: 2}
+  glowHaloMaterial: {fileID: 2100000, guid: 9fdba55e3779a7347be9048e986a6085, type: 2}
+  singleBondMaterial: {fileID: 2100000, guid: c01d03b0ef0adf642a69f4284027f019, type: 2}
+  doubleBondMaterial: {fileID: 2100000, guid: 6964ac68da3976f4c80b585c51fdeac8, type: 2}
+  tripleBondMaterial: {fileID: 2100000, guid: 6e01827391035d44bb597a1116018c39, type: 2}
+  dashedBondMaterial: {fileID: 2100000, guid: caaf2c72888011b4291c49273e9ce52d, type: 2}
+  dashedBondHighlightMaterial: {fileID: 2100000, guid: 28852fdca54ee6943a85d5dca18a7a87, type: 2}
