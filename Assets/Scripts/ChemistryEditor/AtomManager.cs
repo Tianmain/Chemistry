@@ -2,6 +2,10 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
+/// <summary>
+/// 管理所有原子的创建、高亮、光晕和销毁。
+/// 同时维护原子与光晕 GameObject 的映射。
+/// </summary>
 public class AtomManager : MonoBehaviour
 {
     public List<GameObject> atoms = new List<GameObject>();
@@ -16,6 +20,14 @@ public class AtomManager : MonoBehaviour
 
     // 预分配碰撞检测数组，避免 Physics.OverlapSphere 导致 TLS 堆栈内存泄漏
     private Collider[] overlapSphereBuffer = new Collider[16];
+
+    private void Awake()
+    {
+        if (materialManager == null)
+            materialManager = FindObjectOfType<MaterialManager>();
+        if (materialManager == null)
+            Debug.LogError("[AtomManager] MaterialManager 未找到，请在 Inspector 中手动绑定！");
+    }
 
     public bool CheckAtomOverlap(Vector3 position)
     {
@@ -51,6 +63,14 @@ public class AtomManager : MonoBehaviour
 
         atomToParentMap.Add(atom, parent);
         atomCount++;
+
+        if (materialManager == null)
+        {
+            Debug.LogError($"[{nameof(AtomManager)}] materialManager 为空，无法获取 {element.name} 的材质！");
+            Destroy(atom);
+            Destroy(parent);
+            return null;
+        }
 
         Material mat = materialManager.GetElementMaterial(element.name);
         if (mat != null)
@@ -99,6 +119,43 @@ public class AtomManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 立即销毁所有原子并清空内部列表（用于场景加载前清空，避免 Destroy 延迟导致重叠检测失败）
+    /// </summary>
+    public void ClearAllImmediate()
+    {
+        // 立即销毁所有光晕
+        foreach (var kv in atomToGlowMap)
+        {
+            if (kv.Value != null)
+                DestroyImmediate(kv.Value);
+        }
+        atomToGlowMap.Clear();
+
+        // 立即销毁所有原子（通过 parent）
+        foreach (var atom in atoms)
+        {
+            if (atom == null) continue;
+            if (atomToParentMap.TryGetValue(atom, out var parent))
+            {
+                if (parent != null)
+                    DestroyImmediate(parent); // 销毁 parent 会自动销毁 child atom
+            }
+            else
+            {
+                DestroyImmediate(atom);
+            }
+        }
+
+        atoms.Clear();
+        atomToParentMap.Clear();
+    }
+
+    /// <summary>
+    /// 获取当前所有原子（供 SaveManager 存档用）
+    /// </summary>
+    public List<GameObject> GetAllAtoms() => atoms;
+
     public GameObject GetParentObject(GameObject atom)
     {
         return atomToParentMap.ContainsKey(atom) ? atomToParentMap[atom] : null;
@@ -107,12 +164,22 @@ public class AtomManager : MonoBehaviour
     public void HighlightAtom(GameObject atom)
     {
         if (atom == null) return;
+        if (materialManager == null || materialManager.highlightedMaterial == null)
+        {
+            Debug.LogWarning("[HighlightAtom] materialManager 或 highlightedMaterial 为空，跳过高亮");
+            return;
+        }
         atom.GetComponent<Renderer>().material = materialManager.highlightedMaterial;
     }
 
     public void ResetAtomMaterial(GameObject atom)
     {
         if (atom == null) return;
+        if (materialManager == null)
+        {
+            Debug.LogWarning("[ResetAtomMaterial] materialManager 为空，跳过材质重置");
+            return;
+        }
         Material mat = materialManager.GetElementMaterial(atom.name);
         if (mat != null)
             atom.GetComponent<Renderer>().material = mat;

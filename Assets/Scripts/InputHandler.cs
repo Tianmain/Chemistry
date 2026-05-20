@@ -4,6 +4,10 @@ using UnityEngine.UI;
 using System.Text;
 using System.Collections.Generic;
 
+/// <summary>
+/// 输入处理中心：元素选择、原子创建、选中、键类型切换、删除、撤销/重做。
+/// 同时处理键旋转模式下的输入。
+/// </summary>
 public class InputHandler : MonoBehaviour
 {
     [SerializeField] private AtomManager atomManager;

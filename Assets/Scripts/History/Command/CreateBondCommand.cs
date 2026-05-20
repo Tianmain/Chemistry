@@ -33,8 +33,12 @@ public class CreateBondCommand : ICommand
     {
         if (atom1 != null && atom2 != null && dashedBondManager != null)
         {
-            dashedBondManager.DeleteBondBetweenAtoms(atom1, atom2);
-            RefreshGlow();
+            // 安全检查：确认键仍然存在（原子可能已被删除导致键被清理）
+            if (dashedBondManager.FindBondBetweenAtoms(atom1, atom2) != null)
+            {
+                dashedBondManager.DeleteBondBetweenAtoms(atom1, atom2);
+                RefreshGlow();
+            }
         }
     }
 

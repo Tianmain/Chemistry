@@ -2,6 +2,10 @@ using UnityEngine;
 
 public enum Language { English, Chinese }
 
+/// <summary>
+/// 本地化管理器，提供中英文文本查询。
+/// 单例模式，在 Awake 中初始化。
+/// </summary>
 public class LocalizationManager : MonoBehaviour
 {
     public static LocalizationManager Instance;

@@ -1,6 +1,10 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+/// <summary>
+/// 历史管理器，实现撤销/重做功能。
+/// 维护撤销栈和重做栈，最大容量 50 条。
+/// </summary>
 public class HistoryManager : MonoBehaviour
 {
     public Stack<ICommand> undoStack = new Stack<ICommand>();

@@ -10,7 +10,7 @@ public class BondRotator : MonoBehaviour
     // 当前旋转的键
     private GameObject _selectedBond;
     private Vector3 _bondAxis;        // 键的轴向
-    private GameObject _rotateAtom;     // 旋转端的根原子（原子数较少的那端）
+    private GameObject _rotateAtom;     // 旋转端的根原子
     private GameObject _fixedAtom;      // 固定端的根原子
     private List<GameObject> _rotateAtoms = new List<GameObject>();
     private List<GameObject> _rotateBonds = new List<GameObject>();

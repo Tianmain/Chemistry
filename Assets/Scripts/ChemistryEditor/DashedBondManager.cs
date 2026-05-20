@@ -4,6 +4,10 @@ using System.Linq;
 using System;
 using System.Text;
 
+/// <summary>
+/// 管理虚键和实键的创建、转换、销毁和存档序列化。
+/// 负责虚键自动生成、自动转实键、以及键生命周期管理。
+/// </summary>
 public class DashedBondManager : MonoBehaviour
 {
     [SerializeField] private MaterialManager materialManager;

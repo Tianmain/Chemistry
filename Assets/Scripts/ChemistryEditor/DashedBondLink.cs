@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// <summary>
+/// 虚键组件，记录关联原子、末端位置和键类型。
+/// 当关联原子失效时自动销毁。
+/// </summary>
 public class DashedBondLink : MonoBehaviour
 {
     public GameObject linkedAtom;

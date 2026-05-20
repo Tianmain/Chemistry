@@ -1,7 +1,11 @@
+/// <summary>
+/// 记录原子删除，支持撤销/重做。
+/// Execute：删除原子及相连键；Undo：重建原子并恢复键。
+/// </summary>
 using UnityEngine;
 using System.Collections.Generic;
 
-public class DeleteAtomCommand : ICommand
+public class DeleteAtomCommand : ICommand>
 {
     private AtomManager atomManager;
     private DashedBondManager dashedBondManager;
@@ -28,6 +32,9 @@ public class DeleteAtomCommand : ICommand
         }
     }
 
+    /// <summary>
+    /// 执行命令：删除原子。
+    /// </summary>
     public void Execute()
     {
         // 先收集受影响的相邻原子（键删除后 usedBonds 会减少）
@@ -43,6 +50,9 @@ public class DeleteAtomCommand : ICommand
         }
     }
 
+    /// <summary>
+    /// 撤销命令：重建原子。
+    /// </summary>
     public void Undo()
     {
         if (element == null)
@@ -69,6 +79,9 @@ public class DeleteAtomCommand : ICommand
         atomManager.RefreshAllAtomGlows();
     }
 
+    /// <summary>
+    /// 检查命令是否有效（目标原子不为空）。
+    /// </summary>
     public bool IsValid()
     {
         return targetAtom != null && element != null;

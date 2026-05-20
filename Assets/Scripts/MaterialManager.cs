@@ -1,6 +1,10 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "MaterialManager", menuName = "Chemistry/Material Manager")]
+/// <summary>
+/// 材质管理器，为每种元素提供对应的 Material。
+/// 在 Inspector 中配置，供 AtomManager 使用。
+/// </summary>
 public class MaterialManager : ScriptableObject
 {
     public Material hydrogen;
@@ -29,6 +33,23 @@ public class MaterialManager : ScriptableObject
 
     public Material dashedBondMaterial;
     public Material dashedBondHighlightMaterial;
+
+    /// <summary>
+    /// 在 Inspector 中赋值：所有 Element 资源（顺序不限）
+    /// </summary>
+    public Element[] elements;
+
+    /// <summary>
+    /// 按资源名查找 Element（用于存档加载）
+    /// </summary>
+    public Element GetElement(string elementName)
+    {
+        if (elements == null) return null;
+        foreach (var e in elements)
+            if (e != null && e.name == elementName)
+                return e;
+        return null;
+    }
 
     public Material GetElementMaterial(string elementName)
     {

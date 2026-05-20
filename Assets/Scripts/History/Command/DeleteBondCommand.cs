@@ -34,8 +34,12 @@ public class DeleteBondCommand : ICommand
     {
         if (atom1 != null && atom2 != null && dashedBondManager != null)
         {
-            dashedBondManager.DeleteBondBetweenAtoms(atom1, atom2);
-            RefreshGlow();
+            // 安全检查：确认键仍然存在
+            if (dashedBondManager.FindBondBetweenAtoms(atom1, atom2) != null)
+            {
+                dashedBondManager.DeleteBondBetweenAtoms(atom1, atom2);
+                RefreshGlow();
+            }
         }
     }
 
@@ -43,8 +47,12 @@ public class DeleteBondCommand : ICommand
     {
         if (atom1 != null && atom2 != null && dashedBondManager != null)
         {
-            dashedBondManager.CreateBond(atom1, atom2, bondType);
-            RefreshGlow();
+            // 安全检查：确认键尚未被重建（避免重复创建）
+            if (dashedBondManager.FindBondBetweenAtoms(atom1, atom2) == null)
+            {
+                dashedBondManager.CreateBond(atom1, atom2, bondType);
+                RefreshGlow();
+            }
         }
     }
 

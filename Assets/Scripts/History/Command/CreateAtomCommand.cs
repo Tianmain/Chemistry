@@ -1,6 +1,10 @@
+/// <summary>
+/// 记录原子创建，支持撤销/重做。
+/// Execute：创建原子；Undo：删除原子。
+/// </summary>
 using UnityEngine;
 
-public class CreateAtomCommand : ICommand
+public class CreateAtomCommand : ICommand>
 {
     private AtomManager atomManager;
     private Element element;
@@ -17,6 +21,9 @@ public class CreateAtomCommand : ICommand
         this.wasExecuted = false;
     }
 
+    /// <summary>
+    /// 执行命令：创建原子。
+    /// </summary>
     public void Execute()
     {
         if (createdAtom == null)
@@ -27,6 +34,9 @@ public class CreateAtomCommand : ICommand
         }
     }
 
+    /// <summary>
+    /// 撤销命令：删除原子。
+    /// </summary>
     public void Undo()
     {
         if (createdAtom != null && wasExecuted)
@@ -38,11 +48,17 @@ public class CreateAtomCommand : ICommand
         }
     }
 
+    /// <summary>
+    /// 检查命令是否有效（位置未被占用）。
+    /// </summary>
     public bool IsValid()
     {
         return !atomManager.CheckAtomOverlap(position);
     }
 
+    /// <summary>
+    /// 获取已创建的原子（供外部使用）。
+    /// </summary>
     public GameObject GetCreatedAtom()
     {
         return createdAtom;

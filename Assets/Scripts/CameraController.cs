@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// <summary>
+/// 摄像机控制：旋转、平移、缩放。
+/// 旋转围绕选中原子或原点，支持通过 SettingsPanel 调整速度。
+/// </summary>
 public class CameraController : MonoBehaviour
 {
     public float rotationSpeed = 300f;
