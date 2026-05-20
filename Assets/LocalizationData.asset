@@ -1,5 +1,5 @@
 %YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
+%TAG !u! tag:yousandi.cn,2023:
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -142,21 +142,6 @@ MonoBehaviour:
   - key: bond_type_info
     englishText: 'Bond Type: {0}'
     chineseText: "\u952E\u7C7B\u578B\uFF1A{0}"
-  - key: btn_rotate
-    englishText: Rotate Bond
-    chineseText: "\u65CB\u8F6C\u952E"
-  - key: btn_stop_rotate
-    englishText: Stop Rotation
-    chineseText: "\u505C\u6B62\u65CB\u8F6C"
-  - key: text_rotation_angle
-    englishText: 'Rotation: {0}'
-    chineseText: "\u65CB\u8F6C\u89D2\u5ea6\uFF1A{0}"
-  - key: hint_rotation_mode
-    englishText: 'Rotation Mode: Press Q/E or drag to rotate, R/ESC to exit'
-    chineseText: "\u65cb\u8f6c\u6a21\u5f0f\uff1a\u6309 Q/E \u65cb\u8f6c\u6216\u53f3\u952e\u62d6\u62fd\uff0cR/ESC \u9000\u51fa"
-  - key: text_rotation_panel
-    englishText: Bond Rotation
-    chineseText: "\u952E\u65CB\u8F6C\u63A7\u5236"
-  - key: btn_reset_rotation
-    englishText: Reset
-    chineseText: "\u91CD\u7F6E"
+  - key: rotation_angle
+    englishText: 'Rotation Angle: {0}°'
+    chineseText: "\u65CB\u8F6C\u89D2\u5EA6\uFF1A{0}°"

@@ -8,6 +8,7 @@ public class DashedBondManager : MonoBehaviour
 {
     [SerializeField] private MaterialManager materialManager;
     [SerializeField] private AtomManager atomManager;
+    [SerializeField] private HistoryManager historyManager;
 
     /// <summary>
     /// 供 Command 类访问 AtomManager，用于刷新光晕等。
@@ -31,6 +32,11 @@ public class DashedBondManager : MonoBehaviour
 
     public List<GameObject> preservedBonds = new List<GameObject>();
     [SerializeField] public Material preservedBondMaterial;
+
+    /// <summary>
+    /// 供 SaveManager 获取所有实键（存档用）
+    /// </summary>
+    public List<GameObject> GetAllPreservedBonds() => preservedBonds;
 
     /// <summary>
     /// ContextMenu：强制所有保留键可见（修复 activeSelf 未勾选的问题）
@@ -363,20 +369,52 @@ public class DashedBondManager : MonoBehaviour
         if (link == null) return;
 
         GameObject startAtom = link.linkedAtom;
-        Vector3 endPosition = link.endPosition;
         int bondType = link.bondType;
+
+        // 检查两个原子的键位是否都充足，任一不足则拒绝创建
+        if (!HasEnoughBondSlots(startAtom, bondType) || !HasEnoughBondSlots(endAtom, bondType))
+        {
+            Debug.LogWarning($"[AutoConvert] 键位不足，取消转换: {startAtom?.name}-{endAtom?.name}, 键类型:{bondType}");
+            // 清除这个无效的虚键
+            dashedBond.SetActive(false);
+            activeBonds.Remove(dashedBond);
+            dashedBonds.Remove(dashedBond);
+            return;
+        }
 
         dashedBonds.Remove(dashedBond);
         activeBonds.Remove(dashedBond);
         dashedBond.SetActive(false);
 
-        GameObject preservedBond = CreateAutoPreservedBond(startAtom, endAtom, bondType);
-
-        if (preservedBond != null)
+        // 通过 Command 系统记录历史，支持撤销/重做
+        if (historyManager != null)
         {
-            UpdateAtomBondCount(startAtom, endAtom, bondType);
-            Debug.Log($"自动转换虚键为实键: {startAtom.name} - {endAtom.name}, 键类型: {bondType}");
+            var command = new CreateBondCommand(this, startAtom, endAtom, bondType);
+            historyManager.ExecuteCommand(command);
+            Debug.Log($"自动转换虚键为实键（已记录历史）: {startAtom.name} - {endAtom.name}, 键类型: {bondType}");
         }
+        else
+        {
+            // 兜底：直接创建（无历史记录）
+            GameObject preservedBond = CreateAutoPreservedBond(startAtom, endAtom, bondType);
+            if (preservedBond != null)
+            {
+                UpdateAtomBondCount(startAtom, endAtom, bondType);
+                Debug.Log($"自动转换虚键为实键: {startAtom.name} - {endAtom.name}, 键类型: {bondType}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// 检查原子是否有足够的键位容纳指定类型的键
+    /// </summary>
+    private bool HasEnoughBondSlots(GameObject atom, int bondType)
+    {
+        if (atom == null) return false;
+        AtomData data = atom.GetComponent<AtomData>();
+        if (data == null || data.element == null) return false;
+        int remaining = data.element.maxBondCount - data.usedBonds;
+        return remaining >= bondType;
     }
 
     private GameObject CreateAutoPreservedBond(GameObject startAtom, GameObject endAtom, int bondType)
@@ -1460,6 +1498,31 @@ public class DashedBondManager : MonoBehaviour
         preservedBonds.Clear();
     }
 
+    /// <summary>
+    /// 立即销毁所有键并清空内部列表（用于场景加载前清空，避免 Destroy 延迟导致重叠检测失败）
+    /// </summary>
+    public void ClearAllBondsImmediate()
+    {
+        // 立即销毁所有虚键（dashedBondsPool 中的对象）
+        foreach (var bond in dashedBondsPool)
+        {
+            if (bond != null)
+                DestroyImmediate(bond);
+        }
+        dashedBondsPool.Clear();
+        dashedBonds.Clear();
+        activeBonds.Clear();
+        atomToDashedBonds.Clear();
+
+        // 立即销毁所有实键
+        foreach (var bond in preservedBonds)
+        {
+            if (bond != null)
+                DestroyImmediate(bond);
+        }
+        preservedBonds.Clear();
+    }
+
     public void ClearDashedBondsForAtom(GameObject atom)
     {
         foreach (var bond in dashedBonds.Where(b =>
@@ -1469,7 +1532,7 @@ public class DashedBondManager : MonoBehaviour
             // 安全检查：跳过已被转换为 PreservedBond 的对象
             if (bond.CompareTag("PreservedBond"))
             {
-                Debug.LogWarning($"[ClearDashedBondsForAtom] 跳过 PreservedBond: {bond.name} (InstanceID:{bond.GetInstanceID()}), 该对象不应在 dashedBonds 中！");
+                //Debug.LogWarning($"[ClearDashedBondsForAtom] 跳过 PreservedBond: {bond.name} (InstanceID:{bond.GetInstanceID()}), 该对象不应在 dashedBonds 中！");
                 continue;
             }
             bond.SetActive(false);
@@ -1822,10 +1885,19 @@ public class DashedBondManager : MonoBehaviour
 
     /// <summary>
     /// 程序化创建实键（供 Command 使用）
+    /// 创建前检查两个原子的键位是否都充足
     /// </summary>
     public GameObject CreateBond(GameObject atom1, GameObject atom2, int bondType)
     {
         if (atom1 == null || atom2 == null) return null;
+
+        // 检查两个原子的键位是否都充足
+        if (!HasEnoughBondSlots(atom1, bondType) || !HasEnoughBondSlots(atom2, bondType))
+        {
+            Debug.LogWarning($"[CreateBond] 键位不足，取消创建: {atom1.name}-{atom2.name}, 键类型:{bondType}");
+            return null;
+        }
+
         // 去重：避免同一对原子重复创建
         GameObject existing = FindBondBetweenAtoms(atom1, atom2);
         if (existing != null)

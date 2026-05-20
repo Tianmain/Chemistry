@@ -20,15 +20,6 @@ public class UIManager : MonoBehaviour
 
     public static UIManager Instance;
 
-    [System.Serializable]
-    public class LocalizedUIElement
-    {
-        public TMP_Text textComponent;
-        public string localizationKey;
-    }
-
-    [SerializeField] private List<LocalizedUIElement> localizedElements = new List<LocalizedUIElement>();
-
     private void Awake()
     {
         if (Instance == null)
@@ -51,20 +42,8 @@ public class UIManager : MonoBehaviour
 
     public void OnLanguageChanged()
     {
-        UpdateAllUITexts();
         UpdateKeyMapText();
         UpdateUILayout();
-    }
-
-    public void UpdateAllUITexts()
-    {
-        foreach (var element in localizedElements)
-        {
-            if (element.textComponent != null)
-            {
-                element.textComponent.text = LocalizationManager.Instance.GetLocalizedText(element.localizationKey);
-            }
-        }
     }
 
     public void UpdateSelectedInfo(string content)
@@ -93,15 +72,9 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void RegisterLocalizedUI(TMP_Text textComponent, string key)
-    {
-        localizedElements.Add(new LocalizedUIElement { textComponent = textComponent, localizationKey = key });
-    }
-
     void Start()
     {
         keyMapText.gameObject.SetActive(false);
-        UpdateAllUITexts();
         UpdateKeyMapText();
         aboutButton.onClick.AddListener(OnAboutButtonClick);
         UpdateUILayout();

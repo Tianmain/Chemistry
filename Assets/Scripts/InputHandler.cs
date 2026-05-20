@@ -11,6 +11,7 @@ public class InputHandler : MonoBehaviour
     [SerializeField] private UIManager uiManager;
     [SerializeField] private HistoryManager historyManager;
     [SerializeField] private CameraController cameraController;
+    [SerializeField] private BondRotator bondRotator;
 
     private Element selectedElement;
     private GameObject selectedAtom;
@@ -41,12 +42,27 @@ public class InputHandler : MonoBehaviour
 
     void Update()
     {
-        HandleElementSelection();
-        HandleAtomCreation();
-        HandleSelection();
-        HandleBondTypeSelection();
-        HandleDeletion();
-        DashedBondsVisition();
+        // 键旋转模式下，跳过选择/创建/删除等输入，避免冲突
+        bool isRotating = (bondRotator != null && bondRotator.IsRotating());
+
+        if (!isRotating)
+        {
+            HandleElementSelection();
+            HandleAtomCreation();
+            HandleSelection();
+            HandleBondTypeSelection();
+            HandleDeletion();
+            DashedBondsVisition();
+        }
+        else
+        {
+            // 旋转模式下：由 BondRotator 自己处理输入
+            bondRotator.HandleRotationInput();
+
+            // 旋转时每帧更新角度显示
+            isSelectionDirty = true;
+        }
+
         HandleUndoRedo();
         ButtonVisiable();
         UpdateSelectedInfo();
@@ -54,6 +70,12 @@ public class InputHandler : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F12))
         {
             OutputDebugInfo();
+        }
+
+        // 按 R 键启动键旋转（需要选中实键）
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            TryStartBondRotation();
         }
     }
 
@@ -421,19 +443,29 @@ public class InputHandler : MonoBehaviour
     private void UpdateSelectedInfo()
     {
         // 脏标记检查：仅当选中状态变化时才重建字符串，避免每帧 new StringBuilder + string.Format 的临时分配
-        if (!isSelectionDirty) return;
+        // 旋转时也需要更新角度显示
+        bool isRotating = (bondRotator != null && bondRotator.IsRotating());
+        if (!isSelectionDirty && !isRotating) return;
         isSelectionDirty = false;
 
         StringBuilder sb = new StringBuilder();
 
+        // 旋转时只显示旋转角度，不显示其他信息（包括键类型）
+        if (isRotating)
+        {
+            float angle = bondRotator.GetCurrentAngle();
+            string rotationText = LocalizationManager.Instance.GetLocalizedText("rotation_angle");
+            sb.Append(string.Format(rotationText, angle.ToString("F1")));
+            UIManager.Instance.UpdateSelectedInfo(sb.ToString());
+            return;
+        }
+
+        // 非旋转时，显示选中信息（选中原子时不显示键类型）
         if (selectedAtom != null)
         {
             Element element = GetElementFromAtom(selectedAtom);
             string elemName = LocalizationManager.Instance.GetLocalizedText($"element_{element.name.ToLower()}");
             sb.Append($"{elemName} ({element.symbol})");
-
-            string bondTypeText = LocalizationManager.Instance.GetLocalizedText("bond_type_info");
-            sb.Append($" {string.Format(bondTypeText, selectedBondType)}");
         }
 
         if (dashedBondManager.selectedDashedBond != null)
@@ -520,8 +552,7 @@ public class InputHandler : MonoBehaviour
 
     private void DashedBondsVisition()
     {
-        // 虚键生成由 HandleSelection（选中原子时）和 CheckAndConvertDashedBondsToPreserved
-        // （创建原子后自动转换）负责，此处仅同步缓存。
+        // 虚键生成由 HandleSelection和CheckAndConvertDashedBondsToPreserved负责，此处仅同步缓存。
         // 不在此处调用 UpdateDashedBonds，避免键类型切换时错误重建虚键。
         cachedSelectedAtom = selectedAtom;
         cachedSelectedBondType = selectedBondType;
@@ -581,5 +612,71 @@ public class InputHandler : MonoBehaviour
 
         string debugInfo = dashedBondManager.GetDebugInfo();
         Debug.Log("========== 原子与键调试信息 ==========\n" + debugInfo + "\n======================================");
+    }
+
+    /// <summary>
+    /// 尝试启动键旋转
+    /// </summary>
+    private void TryStartBondRotation()
+    {
+        // 检查是否正在旋转中
+        if (bondRotator != null && bondRotator.IsRotating())
+        {
+            bondRotator.StopRotation();
+            Debug.Log("[BondRotator] 停止键旋转");
+            return;
+        }
+
+        GameObject bond = dashedBondManager.selectedDashedBond;
+        if (bond == null || !bond.CompareTag("PreservedBond"))
+        {
+            Debug.LogWarning("[BondRotator] 需要先选中一个实键（PreservedBond）才能旋转");
+            return;
+        }
+
+        // 如果 bondRotator 未赋值，尝试获取
+        if (bondRotator == null)
+        {
+            bondRotator = GetComponent<BondRotator>();
+            if (bondRotator == null)
+            {
+                bondRotator = gameObject.AddComponent<BondRotator>();
+                Debug.Log("[BondRotator] 已自动添加 BondRotator 组件");
+            }
+        }
+
+        bool success = bondRotator.StartRotation(bond);
+        if (success)
+        {
+            bondRotator.onStopRotation = OnBondRotationStopped;
+            Debug.Log("[BondRotator] 键旋转已启动，按住左键拖拽旋转，ESC停止");
+        }
+        else
+        {
+            Debug.LogError("[BondRotator] 启动键旋转失败");
+        }
+    }
+
+    /// <summary>
+    /// 键旋转停止时的回调：取消所有选中
+    /// </summary>
+    private void OnBondRotationStopped()
+    {
+        Debug.Log("[BondRotator] 旋转停止，取消选中");
+
+        // 取消选中键
+        dashedBondManager.UnselectAllBonds();
+        UIManager.Instance.UpdateSelectedInfo("");
+
+        // 取消选中原子
+        if (selectedAtom != null)
+        {
+            atomManager.ResetAtomMaterial(selectedAtom);
+            selectedAtom = null;
+            if (cameraController != null)
+                cameraController.ClearSelectedAtom();
+            dashedBondManager.ClearDashedBonds();
+            isSelectionDirty = true;
+        }
     }
 }
