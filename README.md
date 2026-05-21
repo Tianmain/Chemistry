@@ -1,5 +1,4 @@
-# Chemistry - Unity 化学编辑器 | Chemistry Editor
-
+# Chemistry Editor | Chemistry - Unity 化学编辑器
 [English](#english) | [中文](#中文)
 
 ---
