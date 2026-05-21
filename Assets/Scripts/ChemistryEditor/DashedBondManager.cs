@@ -1504,11 +1504,13 @@ public class DashedBondManager : MonoBehaviour
 
     public bool HasPreservedBondForAtom(GameObject atom)
     {
+        if (atom == null) return false;
         foreach (var bond in preservedBonds)
         {
             if (bond == null) continue;
             PreservedBond pb = bond.GetComponent<PreservedBond>();
-            if (pb != null && pb.OriginalLinkedAtom == atom)
+            if (pb != null &&
+                (pb.OriginalLinkedAtom == atom || pb.OtherLinkedAtom == atom))
                 return true;
         }
         return false;
