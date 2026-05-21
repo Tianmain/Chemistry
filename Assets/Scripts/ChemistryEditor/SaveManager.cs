@@ -351,6 +351,9 @@ public class SaveManager : MonoBehaviour
 
             bondManager.CreateBond(a, b, entry.bondType);
         }
+
+        // 加载完成后，显式重建索引（防御性编程）
+        bondManager.RebuildAtomToPreservedBondsIndex();
     }
 
     /// <summary>

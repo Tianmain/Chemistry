@@ -195,7 +195,7 @@ public class InputHandler : MonoBehaviour
         if (Input.GetMouseButtonDown(1) && selectedElement != null)
         {
             Vector3 screenCenter = new Vector3(0.5f, 0.5f, 10f);
-            Vector3 worldCenter = Camera.main.ViewportToWorldPoint(screenCenter);
+            Vector3 worldCenter = cachedCamera.ViewportToWorldPoint(screenCenter);
 
             if (selectedAtom != null)
             {

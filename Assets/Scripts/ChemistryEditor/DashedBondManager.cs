@@ -37,14 +37,75 @@ public class DashedBondManager : MonoBehaviour
     public List<GameObject> preservedBonds = new List<GameObject>();
     [SerializeField] public Material preservedBondMaterial;
 
+    // 原子→相连实键 索引，避免 BFS 中每次遍历全部键
+    private Dictionary<GameObject, List<GameObject>> atomToPreservedBonds =
+        new Dictionary<GameObject, List<GameObject>>();
+
     /// <summary>
     /// 供 SaveManager 获取所有实键（存档用）
     /// </summary>
     public List<GameObject> GetAllPreservedBonds() => preservedBonds;
 
     /// <summary>
+    /// 将键加入原子→相连实键 索引字典
+    /// </summary>
+    private void AddBondToAtomIndex(GameObject bond)
+    {
+        if (bond == null) return;
+        PreservedBond pb = bond.GetComponent<PreservedBond>();
+        if (pb == null) return;
+
+        GameObject a1 = pb.OriginalLinkedAtom;
+        GameObject a2 = pb.OtherLinkedAtom;
+
+        if (a1 != null)
+        {
+            if (!atomToPreservedBonds.ContainsKey(a1))
+                atomToPreservedBonds[a1] = new List<GameObject>();
+            if (!atomToPreservedBonds[a1].Contains(bond))
+                atomToPreservedBonds[a1].Add(bond);
+        }
+
+        if (a2 != null)
+        {
+            if (!atomToPreservedBonds.ContainsKey(a2))
+                atomToPreservedBonds[a2] = new List<GameObject>();
+            if (!atomToPreservedBonds[a2].Contains(bond))
+                atomToPreservedBonds[a2].Add(bond);
+        }
+    }
+
+    /// <summary>
+    /// 将键从原子→相连实键 索引字典中移除
+    /// </summary>
+    private void RemoveBondFromAtomIndex(GameObject bond)
+    {
+        if (bond == null) return;
+        PreservedBond pb = bond.GetComponent<PreservedBond>();
+        if (pb == null) return;
+
+        GameObject a1 = pb.OriginalLinkedAtom;
+        GameObject a2 = pb.OtherLinkedAtom;
+
+        if (a1 != null && atomToPreservedBonds.ContainsKey(a1))
+        {
+            atomToPreservedBonds[a1].Remove(bond);
+            if (atomToPreservedBonds[a1].Count == 0)
+                atomToPreservedBonds.Remove(a1);
+        }
+
+        if (a2 != null && atomToPreservedBonds.ContainsKey(a2))
+        {
+            atomToPreservedBonds[a2].Remove(bond);
+            if (atomToPreservedBonds[a2].Count == 0)
+                atomToPreservedBonds.Remove(a2);
+        }
+    }
+
+    /// <summary>
     /// 获取与指定原子相连的所有原子（连通分量，BFS 遍历）
     /// 用于实现拖拽原子时整个分子一起移动。
+    /// 优化：使用 atomToPreservedBonds 索引，避免每次遍历全部键。
     /// </summary>
     public List<GameObject> GetConnectedAtoms(GameObject startAtom)
     {
@@ -62,8 +123,11 @@ public class DashedBondManager : MonoBehaviour
             GameObject current = queue.Dequeue();
             connected.Add(current);
 
-            // 查找所有通过实键相连的邻居
-            foreach (var bond in preservedBonds)
+            // 使用索引字典快速查找与当前原子相连的键
+            if (!atomToPreservedBonds.ContainsKey(current))
+                continue;
+
+            foreach (var bond in atomToPreservedBonds[current])
             {
                 if (bond == null) continue;
                 PreservedBond pb = bond.GetComponent<PreservedBond>();
@@ -363,13 +427,20 @@ public class DashedBondManager : MonoBehaviour
 
     /// <summary>
     /// 获取指定原子已有实键占用的方向列表（从原子出发的单位向量）
+    /// 优化：使用 atomToPreservedBonds 索引，避免遍历全部键
     /// </summary>
     private List<Vector3> GetOccupiedDirections(GameObject atom)
     {
         List<Vector3> dirs = new List<Vector3>();
+        if (atom == null) return dirs;
+
         Vector3 atomPos = atom.transform.position;
 
-        foreach (var bond in preservedBonds)
+        // 使用索引字典快速查找与当前原子相连的键
+        if (!atomToPreservedBonds.ContainsKey(atom))
+            return dirs;
+
+        foreach (var bond in atomToPreservedBonds[atom])
         {
             if (bond == null) continue;
             PreservedBond pb = bond.GetComponent<PreservedBond>();
@@ -640,6 +711,7 @@ public class DashedBondManager : MonoBehaviour
         preserved.Initialize(this, link, endAtom);
 
         preservedBonds.Add(bond);
+        AddBondToAtomIndex(bond);
         RemoveDuplicatePreservedBond(bond, startAtom, endAtom);
 
         return bond;
@@ -679,6 +751,9 @@ public class DashedBondManager : MonoBehaviour
                 if (reversePB != null)
                     reversePB.reverseBond = null;
             }
+
+            // 维护原子→键索引字典
+            RemoveBondFromAtomIndex(existing);
 
             preservedBonds.RemoveAt(i);
             Destroy(existing);
@@ -1569,6 +1644,9 @@ public class DashedBondManager : MonoBehaviour
                     reversePB.reverseBond = null;
             }
 
+            // 维护原子→键索引字典
+            RemoveBondFromAtomIndex(bond);
+
             preservedBonds.Remove(bond);
             Destroy(bond);
             Debug.Log($"[DeletePreservedBond] 已从列表移除并Destroy, InstanceID:{bond.GetInstanceID()}");
@@ -1631,6 +1709,24 @@ public class DashedBondManager : MonoBehaviour
                 DestroyImmediate(bond);
         }
         preservedBonds.Clear();
+        atomToPreservedBonds.Clear();
+    }
+
+    /// <summary>
+    /// 重建 atomToPreservedBonds 索引字典（场景加载后调用）
+    /// 遍历 preservedBonds，为每个键建立原子→相连实键的索引
+    /// </summary>
+    public void RebuildAtomToPreservedBondsIndex()
+    {
+        atomToPreservedBonds.Clear();
+
+        foreach (var bond in preservedBonds)
+        {
+            if (bond == null) continue;
+            AddBondToAtomIndex(bond);
+        }
+
+        Debug.Log($"[DashedBondManager] 重建索引完成，共 {atomToPreservedBonds.Count} 个原子有相连实键");
     }
 
     public void ClearDashedBondsForAtom(GameObject atom)
@@ -1790,6 +1886,9 @@ public class DashedBondManager : MonoBehaviour
         // 更新位置
         UpdateDashedBondTransform(bond);
 
+        // 维护原子→键索引字典
+        RemoveBondFromAtomIndex(bond);
+
         // 更新列表
         preservedBonds.Remove(bond);
         if (!dashedBonds.Contains(bond))
@@ -1907,6 +2006,7 @@ public class DashedBondManager : MonoBehaviour
         preserved.Initialize(this, link);
 
         preservedBonds.Add(cylinder);
+        AddBondToAtomIndex(cylinder);
         RemoveDuplicateByPosition(linkedAtom, endPosition);
 
         foreach (var dashedBond in dashedBonds.ToList())
