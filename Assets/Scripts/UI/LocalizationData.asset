@@ -145,3 +145,15 @@ MonoBehaviour:
   - key: rotation_angle
     englishText: 'Rotation Angle: {0}°'
     chineseText: "\u65CB\u8F6C\u89D2\u5EA6\uFF1A{0}°"
+  - key: selected_atom
+    englishText: 'Selected Atom: {0} ({1})'
+    chineseText: "\u9009\u4E2D\u539F\u5B50\uFF1A{0} ({1})"
+  - key: bond_single
+    englishText: Single
+    chineseText: "\u5355\u952E"
+  - key: bond_double
+    englishText: Double
+    chineseText: "\u53CC\u952E"
+  - key: bond_triple
+    englishText: Triple
+    chineseText: "\u4E09\u952E"

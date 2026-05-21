@@ -3835,10 +3835,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   elementText: {fileID: 1476104353}
   keyMapText: {fileID: 770609693}
-  selectedInfoText: {fileID: 2092671284}
+  debugText: {fileID: 2092671284}
   selectedInfoRect: {fileID: 2092671282}
   aboutButton: {fileID: 1584648438}
-  helpButton: {fileID: 1263216075}
+  atomButton: {fileID: 1263216075}
   settingsPanel: {fileID: 1600201247}
 --- !u!4 &1186146637
 Transform:
@@ -4058,7 +4058,7 @@ GameObject:
   - component: {fileID: 1263216075}
   m_Layer: 5
   m_HasEditorInfo: 1
-  m_Name: HelpBotton
+  m_Name: AtomBotton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6839,7 +6839,7 @@ GameObject:
   - component: {fileID: 2092671284}
   m_Layer: 5
   m_HasEditorInfo: 1
-  m_Name: SelectedInfoText
+  m_Name: DebugText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

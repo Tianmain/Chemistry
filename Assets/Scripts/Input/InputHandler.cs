@@ -544,37 +544,53 @@ public class InputHandler : MonoBehaviour
 
         StringBuilder sb = new StringBuilder();
 
-        // 旋转时只输出角度到 Console，不显示在 UI
+        // 旋转时显示角度
         if (isRotating)
         {
             float angle = bondRotator.GetCurrentAngle();
-            Debug.Log($"[BondRotator] 旋转角度: {angle:F1}°");
-            // 清空 UI 显示
-            UIManager.Instance.UpdateSelectedInfo("");
-            return;
+            string angleText = LocalizationManager.Instance.GetLocalizedText("rotation_angle");
+            sb.AppendLine(string.Format(angleText, angle.ToString("F1")));
         }
-
-        // 非旋转时：选中信息只输出到 Console，不显示在 UI
-        if (selectedAtom != null)
+        else
         {
-            Element element = GetElementFromAtom(selectedAtom);
-            string elemName = LocalizationManager.Instance.GetLocalizedText($"element_{element.name.ToLower()}");
-            Debug.Log($"[Selection] 选中原子: {elemName} ({element.symbol})");
-        }
-
-        if (dashedBondManager.selectedDashedBond != null)
-        {
-            DashedBondLink link = dashedBondManager.selectedDashedBond.GetComponent<DashedBondLink>();
-            if (link != null)
+            // 选中原子信息
+            if (selectedAtom != null)
             {
-                string bondType = dashedBondManager.selectedDashedBond.CompareTag("PreservedBond") ?
-                    "PreservedBond" : "DashedBond";
-                Debug.Log($"[Selection] 选中键: type={link.bondType}, tag={bondType}");
+                Element element = GetElementFromAtom(selectedAtom);
+                if (element != null)
+                {
+                    string elemName = LocalizationManager.Instance.GetLocalizedText($"element_{element.name.ToLower()}");
+                    string atomText = LocalizationManager.Instance.GetLocalizedText("selected_atom");
+                    sb.AppendLine(string.Format(atomText, elemName, element.symbol));
+                }
+            }
+
+            // 选中键信息
+            if (dashedBondManager.selectedDashedBond != null)
+            {
+                DashedBondLink link = dashedBondManager.selectedDashedBond.GetComponent<DashedBondLink>();
+                if (link != null)
+                {
+                    string bondTypeStr = GetBondTypeString(link.bondType);
+                    string bondText = LocalizationManager.Instance.GetLocalizedText("bond_type_info");
+                    sb.AppendLine(string.Format(bondText, bondTypeStr));
+                }
             }
         }
 
-        // 清空 UI 上的选中信息显示
-        UIManager.Instance.UpdateSelectedInfo("");
+        string content = sb.ToString().Trim();
+        UIManager.Instance.UpdateSelectedInfo(content ?? "");
+    }
+
+    private string GetBondTypeString(int bondType)
+    {
+        switch (bondType)
+        {
+            case 1: return LocalizationManager.Instance.GetLocalizedText("bond_single");
+            case 2: return LocalizationManager.Instance.GetLocalizedText("bond_double");
+            case 3: return LocalizationManager.Instance.GetLocalizedText("bond_triple");
+            default: return bondType.ToString();
+        }
     }
 
     public void UIUndo()

@@ -50,8 +50,7 @@ public class UIManager : MonoBehaviour
     {
         if (debugText != null)
         {
-            string template = LocalizationManager.Instance.GetLocalizedText("selected_info");
-            debugText.text = string.Format(template, content);
+            debugText.text = content ?? "";
         }
     }
 
