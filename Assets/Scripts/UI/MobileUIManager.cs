@@ -12,13 +12,12 @@ namespace ChemistryEditor.UI
     {
         [Header("UI 设置")]
         [SerializeField] private bool autoCreateUI = true;
-        [SerializeField] private int uiScaleFactor = 2;  // UI 缩放因子（移动端需要更大的按钮）
+        [SerializeField] private int uiScaleFactor = 2;
 
         [Header("颜色")]
         [SerializeField] private Color selectedColor = new Color(0.2f, 0.6f, 1f);
         [SerializeField] private Color normalColor = new Color(0.3f, 0.3f, 0.3f);
 
-        // UI 引用
         private GameObject mobileUIPanel;
         private Dictionary<int, Button> elementButtons = new Dictionary<int, Button>();
         private Dictionary<int, Button> bondTypeButtons = new Dictionary<int, Button>();
@@ -27,11 +26,9 @@ namespace ChemistryEditor.UI
         private Button deleteButton;
         private Button rotateButton;
 
-        // 当前选择
         private int selectedElementIndex = 0;
         private int selectedBondType = 0;
 
-        // 引用
         private MobileInputHandler inputHandler;
         private UIManager uiManager;
         private ChemistryEditor chemistryEditor;
@@ -50,12 +47,8 @@ namespace ChemistryEditor.UI
 #endif
         }
 
-        /// <summary>
-        /// 创建移动端 UI
-        /// </summary>
         private void CreateMobileUI()
         {
-            // 创建 Canvas（如果不存在）
             Canvas canvas = FindObjectOfType<Canvas>();
             if (canvas == null)
             {
@@ -66,69 +59,52 @@ namespace ChemistryEditor.UI
                 canvasObj.AddComponent<GraphicRaycaster>();
             }
 
-            // 创建主面板
             mobileUIPanel = CreatePanel(canvas.transform, "MobileUIPanel");
             RectTransform panelRect = mobileUIPanel.GetComponent<RectTransform>();
             panelRect.anchorMin = new Vector2(0, 0);
-            panelRect.anchorMax = new Vector2(1, 0.25f);  // 底部 25% 区域
+            panelRect.anchorMax = new Vector2(1, 0.3f);
             panelRect.offsetMin = Vector2.zero;
             panelRect.offsetMax = Vector2.zero;
 
-            // 创建元素选择按钮
             CreateElementButtons(mobileUIPanel.transform);
-
-            // 创建化学键类型按钮
             CreateBondTypeButtons(mobileUIPanel.transform);
-
-            // 创建操作按钮
             CreateActionButtons(mobileUIPanel.transform);
 
-            // 初始选择
             UpdateElementButtonSelection(selectedElementIndex);
             UpdateBondTypeButtonSelection(selectedBondType);
         }
 
-        /// <summary>
-        /// 创建元素选择按钮
-        /// </summary>
         private void CreateElementButtons(Transform parent)
         {
-            // 元素列表（从 AtomManager 获取）
             string[] elements = { "H", "He", "Li", "Be", "B", "C", "N", "O", "F", "Ne",
                                  "Na", "Mg", "Al", "Si", "P", "S", "Cl", "Ar" };
 
-            GameObject buttonGrid = CreateGrid(parent, "ElementButtons", 9, 2);  // 9列2行
+            GameObject buttonGrid = CreateGrid(parent, "ElementButtons", 9);
 
             for (int i = 0; i < elements.Length && i < 18; i++)
             {
-                Button btn = CreateButton(buttonGrid.transform, $"Element_{i}", elements[i]);
-                int index = i;  // 闭包捕获
+                Button btn = CreateButton(buttonGrid.transform, "Element_" + i, elements[i]);
+                int index = i;
                 btn.onClick.AddListener(() => OnElementButtonClicked(index));
                 elementButtons[i] = btn;
             }
         }
 
-        /// <summary>
-        /// 创建化学键类型按钮
-        /// </summary>
         private void CreateBondTypeButtons(Transform parent)
         {
             string[] bondTypes = { "单键", "双键", "三键", "虚线" };
 
-            GameObject buttonGrid = CreateGrid(parent, "BondTypeButtons", 4, 1);  // 4列1行
+            GameObject buttonGrid = CreateGrid(parent, "BondTypeButtons", 4);
 
             for (int i = 0; i < bondTypes.Length; i++)
             {
-                Button btn = CreateButton(buttonGrid.transform, $"BondType_{i}", bondTypes[i]);
-                int index = i;  // 闭包捕获
+                Button btn = CreateButton(buttonGrid.transform, "BondType_" + i, bondTypes[i]);
+                int index = i;
                 btn.onClick.AddListener(() => OnBondTypeButtonClicked(index));
                 bondTypeButtons[i] = btn;
             }
         }
 
-        /// <summary>
-        /// 创建操作按钮
-        /// </summary>
         private void CreateActionButtons(Transform parent)
         {
             GameObject actionPanel = CreatePanel(parent, "ActionButtons");
@@ -137,40 +113,34 @@ namespace ChemistryEditor.UI
             hlg.padding = new RectOffset(10, 10, 5, 5);
             hlg.childAlignment = TextAnchor.MiddleCenter;
 
-            // 撤销按钮
             undoButton = CreateButton(actionPanel.transform, "UndoButton", "撤销");
             undoButton.onClick.AddListener(() =>
             {
-                if (chemistryEditor != null)
-                    chemistryEditor.Undo();
+                if (inputHandler != null)
+                    inputHandler.Undo();
             });
 
-            // 重做按钮
             redoButton = CreateButton(actionPanel.transform, "RedoButton", "重做");
             redoButton.onClick.AddListener(() =>
             {
-                if (chemistryEditor != null)
-                    chemistryEditor.Redo();
+                if (inputHandler != null)
+                    inputHandler.Redo();
             });
 
-            // 删除按钮
             deleteButton = CreateButton(actionPanel.transform, "DeleteButton", "删除");
             deleteButton.onClick.AddListener(() =>
             {
                 // TODO: 删除选中的物体
             });
 
-            // 旋转按钮
             rotateButton = CreateButton(actionPanel.transform, "RotateButton", "旋转");
             rotateButton.onClick.AddListener(() =>
             {
-                // TODO: 启动化学键旋转模式
+                if (inputHandler != null)
+                    inputHandler.StartBondRotation();
             });
         }
 
-        /// <summary>
-        /// 元素按钮点击
-        /// </summary>
         private void OnElementButtonClicked(int elementIndex)
         {
             selectedElementIndex = elementIndex;
@@ -180,9 +150,6 @@ namespace ChemistryEditor.UI
                 inputHandler.SetSelectedElement(elementIndex);
         }
 
-        /// <summary>
-        /// 化学键类型按钮点击
-        /// </summary>
         private void OnBondTypeButtonClicked(int bondType)
         {
             selectedBondType = bondType;
@@ -192,9 +159,6 @@ namespace ChemistryEditor.UI
                 inputHandler.SetBondType(bondType);
         }
 
-        /// <summary>
-        /// 更新元素按钮选择状态
-        /// </summary>
         private void UpdateElementButtonSelection(int selectedIndex)
         {
             foreach (var kvp in elementButtons)
@@ -205,9 +169,6 @@ namespace ChemistryEditor.UI
             }
         }
 
-        /// <summary>
-        /// 更新化学键类型按钮选择状态
-        /// </summary>
         private void UpdateBondTypeButtonSelection(int selectedIndex)
         {
             foreach (var kvp in bondTypeButtons)
@@ -225,18 +186,26 @@ namespace ChemistryEditor.UI
             GameObject panel = new GameObject(name);
             panel.transform.SetParent(parent);
             RectTransform rect = panel.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0, 0);
+            rect.anchorMax = new Vector2(1, 1);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
             panel.AddComponent<CanvasRenderer>();
             Image img = panel.AddComponent<Image>();
             img.color = new Color(0.1f, 0.1f, 0.1f, 0.8f);
             return panel;
         }
 
-        private GameObject CreateGrid(Transform parent, string name, int columns, int rows)
+        private GameObject CreateGrid(Transform parent, string name, int columns)
         {
             GameObject grid = new GameObject(name);
             grid.transform.SetParent(parent);
 
             RectTransform rect = grid.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0, 0);
+            rect.anchorMax = new Vector2(1, 1);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
 
             GridLayoutGroup gridLayout = grid.AddComponent<GridLayoutGroup>();
             gridLayout.cellSize = new Vector2(60 * uiScaleFactor, 40 * uiScaleFactor);
@@ -255,7 +224,6 @@ namespace ChemistryEditor.UI
 
             RectTransform rect = btnObj.AddComponent<RectTransform>();
             rect.sizeDelta = new Vector2(60 * uiScaleFactor, 40 * uiScaleFactor);
-
             btnObj.AddComponent<CanvasRenderer>();
             Image img = btnObj.AddComponent<Image>();
             img.color = normalColor;
@@ -267,7 +235,6 @@ namespace ChemistryEditor.UI
             colors.pressedColor = selectedColor;
             btn.colors = colors;
 
-            // 添加文本
             GameObject textObj = new GameObject("Text");
             textObj.transform.SetParent(btnObj.transform);
             RectTransform textRect = textObj.AddComponent<RectTransform>();
