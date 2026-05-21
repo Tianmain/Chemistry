@@ -114,7 +114,7 @@ public class HistoryManager : MonoBehaviour
         undoStack.Clear();
         redoStack.Clear();
         NotifyHistoryChanged();
-        Debug.Log("历史记录已清空");
+        //Debug.Log("历史记录已清空");
     }
 
     private void TrimStack(Stack<ICommand> stack)
