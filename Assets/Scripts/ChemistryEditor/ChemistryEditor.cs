@@ -14,8 +14,4 @@ public class ChemistryEditor : MonoBehaviour
     {
         uiManager.UpdateKeyMapText();
     }
-
-    void Update()
-    {
-    }
 }

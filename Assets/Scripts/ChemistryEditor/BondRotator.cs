@@ -126,38 +126,15 @@ public class BondRotator : MonoBehaviour
     }
 
     /// <summary>
-    /// BFS 获取与指定原子相连的所有原子（排除 excludeAtom）
+    /// 获取与指定原子相连的所有原子（排除 excludeAtom）
+    /// 优化：使用 DashedBondManager 的索引，避免遍历全部键
     /// </summary>
     private HashSet<GameObject> GetConnectedAtoms(GameObject startAtom, GameObject excludeAtom)
     {
-        HashSet<GameObject> visited = new HashSet<GameObject>();
-        Queue<GameObject> queue = new Queue<GameObject>();
-        visited.Add(startAtom);
-        queue.Enqueue(startAtom);
-
-        while (queue.Count > 0)
-        {
-            GameObject current = queue.Dequeue();
-            foreach (var bond in _bondManager.GetAllPreservedBonds())
-            {
-                if (bond == null) continue;
-                PreservedBond pb = bond.GetComponent<PreservedBond>();
-                if (pb == null) continue;
-
-                GameObject other = null;
-                if (pb.OriginalLinkedAtom == current)
-                    other = pb.OtherLinkedAtom;
-                else if (pb.OtherLinkedAtom == current)
-                    other = pb.OriginalLinkedAtom;
-
-                if (other != null && !visited.Contains(other) && other != excludeAtom)
-                {
-                    visited.Add(other);
-                    queue.Enqueue(other);
-                }
-            }
-        }
-        return visited;
+        var connected = _bondManager.GetConnectedAtomsHashSet(startAtom);
+        if (excludeAtom != null && connected.Contains(excludeAtom))
+            connected.Remove(excludeAtom);
+        return connected;
     }
 
     /// <summary>
