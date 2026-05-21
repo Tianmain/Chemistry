@@ -31,6 +31,13 @@ public class InputHandler : MonoBehaviour
     // 脏标记：仅在选中状态变化时重建 UI 文本，避免每帧分配 StringBuilder 和字符串
     private bool isSelectionDirty = true;
 
+    // 原子拖拽相关字段
+    private bool isDragging = false;
+    private Vector3 dragStartMouseWorldPos;
+    private Vector3 dragStartAtomPos;
+    private List<GameObject> draggingConnectedAtoms;
+    private Vector3[] draggingOffsets;
+
     public Button undoButton;
     public Button redoButton;
 
@@ -46,10 +53,13 @@ public class InputHandler : MonoBehaviour
 
     void Update()
     {
+        // 原子拖拽处理（优先于其他输入）
+        HandleAtomDragging();
+
         // 键旋转模式下，跳过选择/创建/删除等输入，避免冲突
         bool isRotating = (bondRotator != null && bondRotator.IsRotating());
 
-        if (!isRotating)
+        if (!isRotating && !isDragging)
         {
             HandleElementSelection();
             HandleAtomCreation();
@@ -58,7 +68,7 @@ public class InputHandler : MonoBehaviour
             HandleDeletion();
             DashedBondsVisition();
         }
-        else
+        else if (isRotating)
         {
             // 旋转模式下：由 BondRotator 自己处理输入
             bondRotator.HandleRotationInput();
@@ -408,6 +418,106 @@ public class InputHandler : MonoBehaviour
                 dashedBondManager.ClearDashedBonds();
             }
         }
+    }
+
+    /// <summary>
+    /// 处理原子拖拽：选中原子后按住左键拖动，所有相连原子一起移动。
+    /// </summary>
+    private void HandleAtomDragging()
+    {
+        // 开始拖拽：鼠标左键按下，且点击了选中的原子
+        if (!isDragging && Input.GetMouseButtonDown(0))
+        {
+            if (selectedAtom != null)
+            {
+                Ray ray = cachedCamera.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out RaycastHit hit))
+                {
+                    if (hit.transform.gameObject == selectedAtom)
+                    {
+                        isDragging = true;
+                        dragStartAtomPos = selectedAtom.transform.position;
+                        dragStartMouseWorldPos = GetMouseWorldPosition();
+
+                        // 获取所有相连的原子及其相对偏移
+                        draggingConnectedAtoms = dashedBondManager.GetConnectedAtoms(selectedAtom);
+                        draggingOffsets = new Vector3[draggingConnectedAtoms.Count];
+                        for (int i = 0; i < draggingConnectedAtoms.Count; i++)
+                        {
+                            draggingOffsets[i] = draggingConnectedAtoms[i].transform.position - dragStartAtomPos;
+                        }
+
+                        return;
+                    }
+                }
+            }
+        }
+
+        // 拖拽中：鼠标左键按住
+        if (isDragging && Input.GetMouseButton(0))
+        {
+            Vector3 currentMouseWorldPos = GetMouseWorldPosition();
+            Vector3 delta = currentMouseWorldPos - dragStartMouseWorldPos;
+            Vector3 newSelectedAtomPos = dragStartAtomPos + delta;
+
+            // 移动选中的原子
+            selectedAtom.transform.position = newSelectedAtomPos;
+
+            // 移动所有相连的原子（保持相对偏移）
+            for (int i = 0; i < draggingConnectedAtoms.Count; i++)
+            {
+                if (draggingConnectedAtoms[i] != null && draggingConnectedAtoms[i] != selectedAtom)
+                {
+                    draggingConnectedAtoms[i].transform.position = newSelectedAtomPos + draggingOffsets[i];
+                }
+            }
+
+            // 更新所有键的 Transform
+            dashedBondManager.UpdateAllBondTransforms();
+
+            return;
+        }
+
+        // 停止拖拽：鼠标左键释放
+        if (isDragging && Input.GetMouseButtonUp(0))
+        {
+            isDragging = false;
+            draggingConnectedAtoms = null;
+            draggingOffsets = null;
+        }
+
+        // 取消拖拽：按 ESC
+        if (isDragging && Input.GetKeyDown(KeyCode.Escape))
+        {
+            // 恢复初始位置
+            selectedAtom.transform.position = dragStartAtomPos;
+            for (int i = 0; i < draggingConnectedAtoms.Count; i++)
+            {
+                if (draggingConnectedAtoms[i] != null && draggingConnectedAtoms[i] != selectedAtom)
+                {
+                    draggingConnectedAtoms[i].transform.position = dragStartAtomPos + draggingOffsets[i];
+                }
+            }
+            dashedBondManager.UpdateAllBondTransforms();
+
+            isDragging = false;
+            draggingConnectedAtoms = null;
+            draggingOffsets = null;
+        }
+    }
+
+    /// <summary>
+    /// 将鼠标屏幕坐标投影到 XZ 平面（Y = dragStartAtomPos.y）
+    /// </summary>
+    private Vector3 GetMouseWorldPosition()
+    {
+        Ray ray = cachedCamera.ScreenPointToRay(Input.mousePosition);
+        Plane plane = new Plane(Vector3.up, dragStartAtomPos);
+        if (plane.Raycast(ray, out float distance))
+        {
+            return ray.GetPoint(distance);
+        }
+        return dragStartAtomPos;
     }
 
     private void HandleUndoRedo()

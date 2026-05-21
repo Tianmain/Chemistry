@@ -43,6 +43,112 @@ public class DashedBondManager : MonoBehaviour
     public List<GameObject> GetAllPreservedBonds() => preservedBonds;
 
     /// <summary>
+    /// 获取与指定原子相连的所有原子（连通分量，BFS 遍历）
+    /// 用于实现拖拽原子时整个分子一起移动。
+    /// </summary>
+    public List<GameObject> GetConnectedAtoms(GameObject startAtom)
+    {
+        if (startAtom == null) return new List<GameObject>();
+
+        List<GameObject> connected = new List<GameObject>();
+        Queue<GameObject> queue = new Queue<GameObject>();
+        HashSet<GameObject> visited = new HashSet<GameObject>();
+
+        queue.Enqueue(startAtom);
+        visited.Add(startAtom);
+
+        while (queue.Count > 0)
+        {
+            GameObject current = queue.Dequeue();
+            connected.Add(current);
+
+            // 查找所有通过实键相连的邻居
+            foreach (var bond in preservedBonds)
+            {
+                if (bond == null) continue;
+                PreservedBond pb = bond.GetComponent<PreservedBond>();
+                if (pb == null) continue;
+
+                GameObject neighbor = null;
+                if (pb.OriginalLinkedAtom == current)
+                    neighbor = pb.OtherLinkedAtom;
+                else if (pb.OtherLinkedAtom == current)
+                    neighbor = pb.OriginalLinkedAtom;
+
+                if (neighbor != null && !visited.Contains(neighbor))
+                {
+                    visited.Add(neighbor);
+                    queue.Enqueue(neighbor);
+                }
+            }
+        }
+
+        return connected;
+    }
+
+    /// <summary>
+    /// 更新所有与指定原子相连的实键的 Transform。
+    /// 原子移动后调用此方法来更新键的显示位置。
+    /// </summary>
+    public void UpdateBondsForAtom(GameObject atom)
+    {
+        if (atom == null) return;
+
+        foreach (var bond in preservedBonds)
+        {
+            if (bond == null) continue;
+            PreservedBond pb = bond.GetComponent<PreservedBond>();
+            if (pb == null) continue;
+
+            // 只更新与指定原子相连的键
+            if (pb.OriginalLinkedAtom != atom && pb.OtherLinkedAtom != atom)
+                continue;
+
+            // 更新键的 Transform
+            GameObject atom1 = pb.OriginalLinkedAtom;
+            GameObject atom2 = pb.OtherLinkedAtom;
+
+            if (atom1 == null || atom2 == null) continue;
+
+            Vector3 start = atom1.transform.position;
+            Vector3 end = atom2.transform.position;
+            Vector3 direction = (end - start).normalized;
+            float length = Vector3.Distance(start, end);
+
+            bond.transform.position = start + direction * length * 0.5f;
+            bond.transform.rotation = Quaternion.FromToRotation(Vector3.up, direction);
+            bond.transform.localScale = new Vector3(0.1f, length / 2, 0.1f);
+        }
+    }
+
+    /// <summary>
+    /// 更新所有实键的 Transform（全量刷新，用于批量移动原子后）
+    /// </summary>
+    public void UpdateAllBondTransforms()
+    {
+        foreach (var bond in preservedBonds)
+        {
+            if (bond == null) continue;
+            PreservedBond pb = bond.GetComponent<PreservedBond>();
+            if (pb == null) continue;
+
+            GameObject atom1 = pb.OriginalLinkedAtom;
+            GameObject atom2 = pb.OtherLinkedAtom;
+
+            if (atom1 == null || atom2 == null) continue;
+
+            Vector3 start = atom1.transform.position;
+            Vector3 end = atom2.transform.position;
+            Vector3 direction = (end - start).normalized;
+            float length = Vector3.Distance(start, end);
+
+            bond.transform.position = start + direction * length * 0.5f;
+            bond.transform.rotation = Quaternion.FromToRotation(Vector3.up, direction);
+            bond.transform.localScale = new Vector3(0.1f, length / 2, 0.1f);
+        }
+    }
+
+    /// <summary>
     /// ContextMenu：强制所有保留键可见（修复 activeSelf 未勾选的问题）
     /// </summary>
     [ContextMenu("Force Visible Preserved Bonds")]
