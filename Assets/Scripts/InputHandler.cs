@@ -507,12 +507,13 @@ public class InputHandler : MonoBehaviour
     }
 
     /// <summary>
-    /// 将鼠标屏幕坐标投影到 XY 平面（Z = dragStartAtomPos.z）
+    /// 将鼠标屏幕坐标投影到与摄像机垂直的平面（通过原子位置）
     /// </summary>
     private Vector3 GetMouseWorldPosition()
     {
         Ray ray = cachedCamera.ScreenPointToRay(Input.mousePosition);
-        Plane plane = new Plane(Vector3.forward, dragStartAtomPos);
+        // 平面法线 = 摄像机 forward 方向，平面通过被拖拽的原子
+        Plane plane = new Plane(cachedCamera.transform.forward, dragStartAtomPos);
         if (plane.Raycast(ray, out float distance))
         {
             return ray.GetPoint(distance);
