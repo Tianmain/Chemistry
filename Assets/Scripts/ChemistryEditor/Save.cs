@@ -1,6 +1,4 @@
-#if UNITY_EDITOR
 using UnityEngine;
-using UnityEditor;
 using TMPro;
 using UnityEngine.UI;
 using System.Collections.Generic;
@@ -8,6 +6,7 @@ using System.IO;
 
 /// <summary>
 /// 场景存档面板：打开 / 保存 / 另存为
+/// 同时支持 Unity Editor 和独立打包版本（Windows）
 /// </summary>
 public class Save : MonoBehaviour
 {
@@ -29,15 +28,17 @@ public class Save : MonoBehaviour
         if (saveButton   != null) saveButton.onClick.AddListener(OnSaveClicked);
         if (saveAsButton != null) saveAsButton.onClick.AddListener(OnSaveAsClicked);
     }
+
+    // ==================== Open ====================
     private void OnOpenClicked()
     {
         if (SaveManager.Instance == null)
         {
-            Debug.LogError("[SavePanel] SaveManager.Instance 为空");
+            Debug.LogError("[Save] SaveManager.Instance 为空");
             return;
         }
 
-        string path = EditorUtility.OpenFilePanel(
+        string path = OpenFileDialog(
             "Open Scene / 打开场景",
             SaveManager.Instance.GetSaveDirectory(),
             "json"
@@ -50,19 +51,19 @@ public class Save : MonoBehaviour
         if (ok)
         {
             _currentFilePath = path;
-            //Debug.Log($"[SavePanel] Opened: {Path.GetFileName(path)} / 已打开：{Path.GetFileName(path)}");
         }
         else
         {
-            Debug.LogError($"[SavePanel] Failed to open: {Path.GetFileName(path)} / 打开失败：{Path.GetFileName(path)}");
+            Debug.LogError($"[Save] 打开失败：{Path.GetFileName(path)}");
         }
     }
 
+    // ==================== Save ====================
     private void OnSaveClicked()
     {
         if (SaveManager.Instance == null)
         {
-            Debug.LogError("[SavePanel] SaveManager.Instance 为空");
+            Debug.LogError("[Save] SaveManager.Instance 为空");
             return;
         }
 
@@ -73,16 +74,18 @@ public class Save : MonoBehaviour
         }
 
         bool ok = SaveManager.Instance.SaveSceneToPath(_currentFilePath, atomManager, dashedBondManager);
-        //Debug.Log(ok
-        //    ? $"[SavePanel] Saved: {Path.GetFileName(_currentFilePath)} / 已保存：{Path.GetFileName(_currentFilePath)}"
-        //    : $"[SavePanel] Failed to save: {Path.GetFileName(_currentFilePath)} / 保存失败：{Path.GetFileName(_currentFilePath)}");
+        if (!ok)
+        {
+            Debug.LogError($"[Save] 保存失败：{Path.GetFileName(_currentFilePath)}");
+        }
     }
 
+    // ==================== Save As ====================
     private void OnSaveAsClicked()
     {
         if (SaveManager.Instance == null)
         {
-            Debug.LogError("[SavePanel] SaveManager.Instance 为空");
+            Debug.LogError("[Save] SaveManager.Instance 为空");
             return;
         }
 
@@ -94,7 +97,7 @@ public class Save : MonoBehaviour
             ? "scene.json"
             : Path.GetFileName(_currentFilePath);
 
-        string path = EditorUtility.SaveFilePanel(
+        string path = SaveFileDialog(
             "Save Scene As / 场景另存为",
             directory,
             defaultName,
@@ -108,12 +111,33 @@ public class Save : MonoBehaviour
         if (ok)
         {
             _currentFilePath = path;
-            //Debug.Log($"[SavePanel] Saved as: {Path.GetFileName(path)} / 另存为成功：{Path.GetFileName(path)}");
         }
         else
         {
-            Debug.LogError($"[SavePanel] Failed to save as: {Path.GetFileName(path)} / 另存为失败：{Path.GetFileName(path)}");
+            Debug.LogError($"[Save] 另存为失败：{Path.GetFileName(path)}");
         }
     }
-}
+
+    // ==================== 平台适配 ====================
+#if UNITY_EDITOR
+    private string OpenFileDialog(string title, string directory, string extension)
+    {
+        return UnityEditor.EditorUtility.OpenFilePanel(title, directory, extension);
+    }
+
+    private string SaveFileDialog(string title, string directory, string defaultName, string extension)
+    {
+        return UnityEditor.EditorUtility.SaveFilePanel(title, directory, defaultName, extension);
+    }
+#else
+    private string OpenFileDialog(string title, string directory, string extension)
+    {
+        return NativeFileDialog.OpenFilePanel(title, directory, extension);
+    }
+
+    private string SaveFileDialog(string title, string directory, string defaultName, string extension)
+    {
+        return NativeFileDialog.SaveFilePanel(title, directory, defaultName, extension);
+    }
 #endif
+}
