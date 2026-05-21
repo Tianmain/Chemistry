@@ -9,9 +9,9 @@
 
 A 3D chemistry molecule editor developed with Unity, supporting interactive creation, editing, and visualization of atoms and chemical bonds.
 
-**📥 Download Standalone Build**: https://github.com/Tianmain/Chemistry-Setting
+**Download Standalone Build**: https://github.com/Tianmain/Chemistry-Setting
 
-### ✨ Features
+### Features
 
 #### Core Features
 - **15 Element System** - Supports various chemical elements including Hydrogen, Carbon, Nitrogen, Oxygen, Sulfur, Sodium, etc.
@@ -27,7 +27,7 @@ A 3D chemistry molecule editor developed with Unity, supporting interactive crea
 - **Real-time Info Display** - Shows detailed info when selecting elements (bond type, rotation angle, etc.)
 - **Source Han Sans Font** - High-quality Chinese text rendering
 
-### 🎮 Controls
+### Controls
 
 | Action | Key / Description |
 |--------|-------------------|
@@ -39,7 +39,7 @@ A 3D chemistry molecule editor developed with Unity, supporting interactive crea
 | Undo | `Ctrl + Z` |
 | Redo | `Ctrl + Y` |
 
-### 📦 Installation & Running (Source Code)
+### Installation & Running (Source Code)
 
 1. Clone the repository:
    ```bash
@@ -52,17 +52,17 @@ A 3D chemistry molecule editor developed with Unity, supporting interactive crea
 
 4. Click Play to run
 
-### 📄 License
+### License
 
 This project is for personal learning and research purposes only.
 
-### 🙋 Contact
+### Contact
 
 - GitHub: [@Tianmain](https://github.com/Tianmain)
 
 ---
 
-⚗️ *Making chemistry molecule editing more intuitive with Unity*
+*Making chemistry molecule editing more intuitive with Unity*
 
 ---
 
@@ -73,9 +73,9 @@ This project is for personal learning and research purposes only.
 
 一个基于 Unity 开发的 3D 化学分子编辑器，支持原子与化学键的交互式创建、编辑和可视化。
 
-**📥 下载独立构建版**：https://github.com/Tianmain/Chemistry-Setting
+**下载独立构建版**：https://github.com/Tianmain/Chemistry-Setting
 
-### ✨ 功能特性
+### 功能特性
 
 #### 核心功能
 - **15 种元素系统** - 支持氢、碳、氮、氧、硫、钠等多种化学元素
@@ -91,7 +91,7 @@ This project is for personal learning and research purposes only.
 - **实时信息显示** - 选中元素时显示详细信息（键类型、旋转角度等）
 - **Source Han Sans 字体** - 优质的中文显示效果
 
-### 🎮 操作说明
+### 操作说明
 
 | 操作 | 按键/说明 |
 |------|-----------|
@@ -103,7 +103,7 @@ This project is for personal learning and research purposes only.
 | 撤销 | `Ctrl + Z` |
 | 重做 | `Ctrl + Y` |
 
-### 📦 安装运行（源代码）
+### 安装运行
 
 1. 克隆仓库到本地：
    ```bash
@@ -116,14 +116,13 @@ This project is for personal learning and research purposes only.
 
 4. 点击 Play 运行
 
-### 📄 许可证
+### 许可证
 
 本项目为个人学习研究项目，仅供学习交流使用。
 
-### 🙋 联系方式
+### 联系方式
 
 - GitHub: [@Tianmain](https://github.com/Tianmain)
 
 ---
-
-⚗️ *用 Unity 让化学分子编辑更直观*
+*用 Unity 让化学分子编辑更直观*
