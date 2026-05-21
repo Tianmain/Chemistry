@@ -8,7 +8,6 @@ using System.IO;
 
 /// <summary>
 /// 场景存档面板：打开 / 保存 / 另存为
-/// 仅在 Unity Editor 中编译。
 /// </summary>
 public class Save : MonoBehaviour
 {
@@ -51,7 +50,7 @@ public class Save : MonoBehaviour
         if (ok)
         {
             _currentFilePath = path;
-            Debug.Log($"[SavePanel] Opened: {Path.GetFileName(path)} / 已打开：{Path.GetFileName(path)}");
+            //Debug.Log($"[SavePanel] Opened: {Path.GetFileName(path)} / 已打开：{Path.GetFileName(path)}");
         }
         else
         {
@@ -74,9 +73,9 @@ public class Save : MonoBehaviour
         }
 
         bool ok = SaveManager.Instance.SaveSceneToPath(_currentFilePath, atomManager, dashedBondManager);
-        Debug.Log(ok
-            ? $"[SavePanel] Saved: {Path.GetFileName(_currentFilePath)} / 已保存：{Path.GetFileName(_currentFilePath)}"
-            : $"[SavePanel] Failed to save: {Path.GetFileName(_currentFilePath)} / 保存失败：{Path.GetFileName(_currentFilePath)}");
+        //Debug.Log(ok
+        //    ? $"[SavePanel] Saved: {Path.GetFileName(_currentFilePath)} / 已保存：{Path.GetFileName(_currentFilePath)}"
+        //    : $"[SavePanel] Failed to save: {Path.GetFileName(_currentFilePath)} / 保存失败：{Path.GetFileName(_currentFilePath)}");
     }
 
     private void OnSaveAsClicked()
@@ -109,7 +108,7 @@ public class Save : MonoBehaviour
         if (ok)
         {
             _currentFilePath = path;
-            Debug.Log($"[SavePanel] Saved as: {Path.GetFileName(path)} / 另存为成功：{Path.GetFileName(path)}");
+            //Debug.Log($"[SavePanel] Saved as: {Path.GetFileName(path)} / 另存为成功：{Path.GetFileName(path)}");
         }
         else
         {

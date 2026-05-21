@@ -7,19 +7,18 @@ public class Element
     public int maxBondCount;
 
     /// <summary>
-    /// 孤电子对数（VSEPR）。孤电子对排斥力大于成键电子对，会压缩键角。
+    /// 孤电子对数
     /// C/Si: 0对(109.5°)  N/P/Al: 1对(107°)  O/S: 2对(104.5°)
     /// </summary>
     public int lonePairCount;
 
     /// <summary>
-    /// 实际键角（度），由 maxBondCount 和孤电子对共同决定（VSEPR 理论）。
-    /// 用于虚键方向生成，确保键角准确。
+    /// 实际键角，由maxBondCount和孤电子对共同决定
     /// </summary>
     public float bondAngle;
 
     /// <summary>
-    /// 元素定义，包含名称、符号、半径、最大键数、孤电子对数和键角。
+    /// 元素定义，包含名称、符号、半径、最大键数、孤电子对数和键角
     /// 使用 VSEPR 理论计算虚键方向。
     /// </summary>
     public Element(string name, string symbol, float radius, int maxBondCount,

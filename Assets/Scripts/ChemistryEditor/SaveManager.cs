@@ -22,9 +22,7 @@ public class SaveManager : MonoBehaviour
 
     [SerializeField] private MaterialManager materialManager;
 
-    /// <summary>
-    /// 存档文件目录（编辑器：项目 Saves/ ；打包后：persistentDataPath）
-    /// </summary>
+    // 存档文件目录
     public string GetSaveDirectory()
     {
 #if UNITY_EDITOR
@@ -40,10 +38,7 @@ public class SaveManager : MonoBehaviour
         return path;
 #endif
     }
-
-    /// <summary>
-    /// 从任意本地路径加载场景（用于文件对话框打开）
-    /// </summary>
+    // 从任意本地路径加载场景
     public bool LoadSceneFromPath(string fullPath, AtomManager atomManager, DashedBondManager bondManager)
     {
         if (string.IsNullOrEmpty(fullPath) || !File.Exists(fullPath))
@@ -64,7 +59,7 @@ public class SaveManager : MonoBehaviour
 
             if (historyManager != null) historyManager.Clear();
             ApplySaveData(data, atomManager, bondManager);
-            Debug.Log($"[SaveManager] 已加载: {Path.GetFileName(fullPath)} ({data.atoms.Count} 个原子, {data.bonds.Count} 条键)");
+            //Debug.Log($"[SaveManager] 已加载: {Path.GetFileName(fullPath)} ({data.atoms.Count} 个原子, {data.bonds.Count} 条键)");
             return true;
         }
         catch (System.Exception e)
@@ -74,9 +69,7 @@ public class SaveManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 保存场景到任意本地路径（用于文件对话框另存为）
-    /// </summary>
+    // 保存场景到任意本地路径
     public bool SaveSceneToPath(string fullPath, AtomManager atomManager, DashedBondManager bondManager)
     {
         if (atomManager == null || bondManager == null)
@@ -90,7 +83,7 @@ public class SaveManager : MonoBehaviour
             MoleculeSaveData data = BuildSaveData(atomManager, bondManager);
             string json = JsonUtility.ToJson(data, true);
             File.WriteAllText(fullPath, json);
-            Debug.Log($"[SaveManager] 已保存: {Path.GetFileName(fullPath)} ({data.atoms.Count} 个原子, {data.bonds.Count} 条键)");
+            //Debug.Log($"[SaveManager] 已保存: {Path.GetFileName(fullPath)} ({data.atoms.Count} 个原子, {data.bonds.Count} 条键)");
             return true;
         }
         catch (System.Exception e)
@@ -100,7 +93,6 @@ public class SaveManager : MonoBehaviour
         }
     }
 
-    // 内部引用（LoadSceneFromPath 需要清空 history）
     private HistoryManager historyManager;
     private void Awake()
     {
@@ -120,9 +112,7 @@ public class SaveManager : MonoBehaviour
         string _ = GetSaveDirectory();
     }
 
-    /// <summary>
-    /// 获取所有存档文件名（不含扩展名，按修改时间倒序）
-    /// </summary>
+    // 获取所有存档文件名
     public List<string> GetSaveFileNames()
     {
         string dir = GetSaveDirectory();
@@ -142,9 +132,7 @@ public class SaveManager : MonoBehaviour
         return sorted;
     }
 
-    /// <summary>
-    /// 保存当前场景到指定文件名（自动加 .json）
-    /// </summary>
+    // 保存当前场景到指定文件名
     public bool SaveScene(string fileName, AtomManager atomManager, DashedBondManager bondManager)
     {
         if (atomManager == null || bondManager == null)
@@ -164,7 +152,7 @@ public class SaveManager : MonoBehaviour
             string json = JsonUtility.ToJson(data, true);
             string path = GetFullPath(fileName);
             File.WriteAllText(path, json);
-            Debug.Log($"场景已保存: {fileName} ({data.atoms.Count} 个原子, {data.bonds.Count} 条键)");
+            //Debug.Log($"场景已保存: {fileName} ({data.atoms.Count} 个原子, {data.bonds.Count} 条键)");
             return true;
         }
         catch (System.Exception e)
@@ -174,9 +162,7 @@ public class SaveManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 从指定文件加载场景（会清空当前场景）
-    /// </summary>
+    // 从指定文件加载场景，清空当前场景
     public bool LoadScene(string fileName, AtomManager atomManager, DashedBondManager bondManager)
     {
         if (atomManager == null || bondManager == null)
@@ -204,7 +190,7 @@ public class SaveManager : MonoBehaviour
 
             if (historyManager != null) historyManager.Clear();
             ApplySaveData(data, atomManager, bondManager);
-            Debug.Log($"场景已加载: {fileName} ({data.atoms.Count} 个原子, {data.bonds.Count} 条键)");
+            //Debug.Log($"场景已加载: {fileName} ({data.atoms.Count} 个原子, {data.bonds.Count} 条键)");
             return true;
         }
         catch (System.Exception e)
@@ -214,39 +200,33 @@ public class SaveManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 删除指定存档文件
-    /// </summary>
-    public bool DeleteSave(string fileName)
-    {
-        string path = GetFullPath(fileName);
-        if (!File.Exists(path))
-            return false;
+    // 删除指定存档文件
+    //public bool DeleteSave(string fileName)
+    //{
+    //    string path = GetFullPath(fileName);
+    //    if (!File.Exists(path))
+    //        return false;
 
-        try
-        {
-            File.Delete(path);
-            Debug.Log($"存档已删除: {fileName}");
-            return true;
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError($"删除失败: {e.Message}");
-            return false;
-        }
-    }
+    //    try
+    //    {
+    //        File.Delete(path);
+    //        Debug.Log($"存档已删除: {fileName}");
+    //        return true;
+    //    }
+    //    catch (System.Exception e)
+    //    {
+    //        Debug.LogError($"删除失败: {e.Message}");
+    //        return false;
+    //    }
+    //}
 
-    /// <summary>
-    /// 检查指定文件名是否已存在
-    /// </summary>
+    // 检查指定文件名是否已存在
     public bool FileExists(string fileName)
     {
         return File.Exists(GetFullPath(fileName));
     }
 
-    /// <summary>
-    /// 获取完整的文件路径（自动补 .json）
-    /// </summary>
+    // 获取完整的文件路径
     public string GetFullPath(string fileName)
     {
         string name = fileName.Trim();
@@ -255,8 +235,7 @@ public class SaveManager : MonoBehaviour
         return Path.Combine(GetSaveDirectory(), name);
     }
 
-    // ─── 私有方法：构建存档数据 ─────────────────────────────
-
+    // 构建存档数据
     private MoleculeSaveData BuildSaveData(AtomManager atomManager, DashedBondManager bondManager)
     {
         MoleculeSaveData data = new MoleculeSaveData();
@@ -309,11 +288,10 @@ public class SaveManager : MonoBehaviour
         return data;
     }
 
-    // ─── 私有方法：应用存档数据（先清空场景，再重建） ─────
-
+    // 私有方法：应用存档数据
     private void ApplySaveData(MoleculeSaveData data, AtomManager atomManager, DashedBondManager bondManager)
     {
-        // 先清空场景，再加载（无论 materialManager 是否为空）
+        // 先清空场景
         ClearCurrentScene(atomManager, bondManager);
 
         if (materialManager == null)
@@ -352,16 +330,13 @@ public class SaveManager : MonoBehaviour
             bondManager.CreateBond(a, b, entry.bondType);
         }
 
-        // 加载完成后，显式重建索引（防御性编程）
+        // 加载完成后，显式重建索引
         bondManager.RebuildAtomToPreservedBondsIndex();
     }
 
-    /// <summary>
-    /// 清空当前场景所有原子和键（使用 DestroyImmediate，确保物理检测不残留）
-    /// </summary>
+    // 清空当前场景所有原子和键
     private void ClearCurrentScene(AtomManager atomManager, DashedBondManager bondManager)
     {
-        // 使用立即销毁，避免 Destroy() 延迟导致加载时重叠检测误判
         if (bondManager != null)
             bondManager.ClearAllBondsImmediate();
         if (atomManager != null)

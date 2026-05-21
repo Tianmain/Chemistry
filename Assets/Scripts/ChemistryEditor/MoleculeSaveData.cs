@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// 分子结构存档数据（纯数据，可 JSON 序列化）
+/// 分子结构存档数据
 /// </summary>
 [System.Serializable]
 public class MoleculeSaveData
@@ -23,7 +23,7 @@ public class MoleculeSaveData
 [System.Serializable]
 public class AtomSaveEntry
 {
-    public string elementName;   // 元素名，如 "Hydrogen"
+    public string elementName;
     public float posX, posY, posZ;
     public int usedBonds;
 }
