@@ -46,7 +46,7 @@ A 3D chemistry molecule editor developed with Unity, supporting interactive crea
    git clone https://github.com/Tianmain/Chemistry.git
    ```
 
-2. Open the project with Unity Hub (Unity 2022.3 or later recommended)
+2. Open the project with Unity or Tuanjie Hub
 
 3. Open scene `Assets/Scenes/AtomCreator.unity`
 
@@ -110,7 +110,7 @@ This project is for personal learning and research purposes only.
    git clone https://github.com/Tianmain/Chemistry.git
    ```
 
-2. 使用 Unity Hub 打开项目（建议 Unity 2022.3 或更高版本）
+2. 使用 Unity Hub 或者 Tuanjie Hub 打开项目
 
 3. 打开场景 `Assets/Scenes/AtomCreator.unity`
 
