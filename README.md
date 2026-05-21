@@ -39,7 +39,7 @@ A 3D chemistry molecule editor developed with Unity, supporting interactive crea
 
 ### 🛠 Tech Stack
 
-- **Engine**: Unity 2022+
+- **Engine**: Tuanjie 1.8.2
 - **Language**: C# (.NET 4.x+)
 - **Architecture**: Command Pattern for undo/redo system
 - **UI**: Unity UI (uGUI) + Chinese localization
@@ -128,7 +128,7 @@ This project is for personal learning and research purposes only.
 
 ### 🛠 技术栈
 
-- **引擎**: Unity 2022+
+- **引擎**: Tuanjie 1.8.2
 - **语言**: C# (.NET 4.x+)
 - **架构**: 命令模式（Command Pattern）实现撤销/重做系统
 - **UI**: Unity UI (uGUI) + 自定义中文本地化
