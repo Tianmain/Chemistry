@@ -693,6 +693,14 @@ public class InputHandler : MonoBehaviour
 
     private Element GetElementFromAtom(GameObject atom)
     {
+        if (atom == null) return null;
+
+        AtomData atomData = atom.GetComponent<AtomData>();
+        if (atomData != null && atomData.element != null)
+            return atomData.element;
+
+        // 兜底：如果 AtomData 不存在，才使用名称匹配（兼容旧逻辑）
+        Debug.LogWarning($"[InputHandler] 原子 {atom.name} 缺少 AtomData 组件，使用名称匹配");
         return atom.name switch
         {
             "Hydrogen" => Element.Hydrogen,

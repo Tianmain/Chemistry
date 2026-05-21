@@ -102,9 +102,22 @@ public class AtomManager : MonoBehaviour
 
     public void DeleteAtom(GameObject atom)
     {
-        // 清理光晕
+        if (atom == null) return;
+
+        // 1. 清理光晕
         HideGlowHalo(atom);
 
+        // 2. 清理与原子相连的键（先实键转虚键，再清理虚键）
+        if (dashedBondManager != null)
+        {
+            // 将实键转换回虚键
+            dashedBondManager.DeletePreservedBondsForAtom(atom);
+
+            // 清理该原子的虚键
+            dashedBondManager.ClearDashedBondsForAtom(atom);
+        }
+
+        // 3. 从列表和映射中移除，并销毁
         if (atomToParentMap.ContainsKey(atom))
         {
             GameObject parent = atomToParentMap[atom];
@@ -282,6 +295,14 @@ public class AtomManager : MonoBehaviour
 
     public Element GetElementFromAtom(GameObject atom)
     {
+        if (atom == null) return null;
+
+        AtomData atomData = atom.GetComponent<AtomData>();
+        if (atomData != null && atomData.element != null)
+            return atomData.element;
+
+        // 兜底：如果 AtomData 不存在，才使用名称匹配（兼容旧逻辑）
+        Debug.LogWarning($"[AtomManager] 原子 {atom.name} 缺少 AtomData 组件，使用名称匹配");
         return atom.name switch
         {
             "Hydrogen" => Element.Hydrogen,

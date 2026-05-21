@@ -3,14 +3,15 @@ using System.Collections.Generic;
 
 /// <summary>
 /// 历史管理器，实现撤销/重做功能。
-/// 维护撤销栈和重做栈，最大容量 50 条。
+/// 维护撤销栈和重做栈，最大容量可在 Inspector 中配置。
 /// </summary>
 public class HistoryManager : MonoBehaviour
 {
     public Stack<ICommand> undoStack = new Stack<ICommand>();
     public Stack<ICommand> redoStack = new Stack<ICommand>();
 
-    private const int MaxHistorySize = 50;
+    [SerializeField] private int maxHistorySize = 50;
+    public int MaxHistorySize => maxHistorySize;
 
     public event System.Action<int, int> OnHistoryChanged;
 
@@ -65,8 +66,15 @@ public class HistoryManager : MonoBehaviour
         catch (System.Exception e)
         {
             Debug.LogError($"撤销失败: {e.Message}");
-            try { command.Execute(); }
-            catch { }
+            try
+            {
+                command.Execute();
+                Debug.LogWarning("撤销失败，但已成功恢复执行");
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"撤销失败且无法恢复执行: {ex.Message}");
+            }
         }
 
         NotifyHistoryChanged();
@@ -111,15 +119,24 @@ public class HistoryManager : MonoBehaviour
 
     private void TrimStack(Stack<ICommand> stack)
     {
-        // Stack 无法直接访问底部，需转为 List 移除最旧的命令
-        while (stack.Count > MaxHistorySize)
-        {
-            var tempList = new List<ICommand>(stack);
-            tempList.RemoveAt(0);
-            stack.Clear();
-            for (int i = tempList.Count - 1; i >= 0; i--)
-                stack.Push(tempList[i]);
-        }
+        if (stack.Count <= maxHistorySize)
+            return;
+
+        // 使用两个临时栈来移除最旧的命令，避免 List 分配
+        // Stack 是 LIFO，最旧的在底部，最新的在顶部
+        // 步骤1：将栈中元素反转（现在最新的在底部，最旧的在顶部）
+        Stack<ICommand> tempStack = new Stack<ICommand>();
+        while (stack.Count > 0)
+            tempStack.Push(stack.Pop());
+
+        // 步骤2：弹出多余的命令（现在顶部是最旧的）
+        int removeCount = tempStack.Count - maxHistorySize;
+        for (int i = 0; i < removeCount; i++)
+            tempStack.Pop();
+
+        // 步骤3：再次反转，将保留的命令压回原栈（现在最新的在顶部）
+        while (tempStack.Count > 0)
+            stack.Push(tempStack.Pop());
     }
 
     private void NotifyHistoryChanged()
