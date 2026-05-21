@@ -45,6 +45,15 @@ public class InputHandler : MonoBehaviour
     // 预分配 RaycastHit
     private RaycastHit raycastHitCache;
 
+    // 触摸输入状态
+    private bool useTouchInput = false;
+    private bool isTouchDragging = false;
+    private Vector3 touchDragStartWorldPos;
+    private Vector3 touchDragStartAtomPos;
+    private List<GameObject> touchDraggingConnectedAtoms;
+    private Vector3[] touchDraggingOffsets;
+    private int activeTouchId = -1;
+
     private void Awake()
     {
         cachedCamera = Camera.main;
