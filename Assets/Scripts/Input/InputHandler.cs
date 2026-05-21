@@ -28,7 +28,6 @@ public class InputHandler : MonoBehaviour
 
     private Dictionary<GameObject, int> atomBondTypes = new Dictionary<GameObject, int>();
 
-    // 脏标记：仅在选中状态变化时重建 UI 文本，避免每帧分配 StringBuilder 和字符串
     private bool isSelectionDirty = true;
 
     // 原子拖拽相关字段
@@ -41,9 +40,9 @@ public class InputHandler : MonoBehaviour
     public Button undoButton;
     public Button redoButton;
 
-    // 缓存 Camera，避免 Camera.main 内部 FindObjectOfType 导致 TLS 泄漏
+    // 缓存 Camera
     private Camera cachedCamera;
-    // 预分配 RaycastHit，避免 Physics.Raycast(out RaycastHit) 在 TLS 上分配
+    // 预分配 RaycastHit
     private RaycastHit raycastHitCache;
 
     private void Awake()
@@ -53,7 +52,7 @@ public class InputHandler : MonoBehaviour
 
     void Update()
     {
-        // 原子拖拽处理（优先于其他输入）
+        // 原子拖拽处理
         HandleAtomDragging();
 
         // 键旋转模式下，跳过选择/创建/删除等输入，避免冲突
@@ -70,7 +69,7 @@ public class InputHandler : MonoBehaviour
         }
         else if (isRotating)
         {
-            // 旋转模式下：由 BondRotator 自己处理输入
+            // 旋转模式下，由 BondRotator 自己处理输入
             bondRotator.HandleRotationInput();
 
             // 旋转时每帧更新角度显示
@@ -86,7 +85,7 @@ public class InputHandler : MonoBehaviour
             OutputDebugInfo();
         }
 
-        // 按 R 键启动键旋转（需要选中实键）
+        // 按 R 键启动键旋转
         if (Input.GetKeyDown(KeyCode.R))
         {
             TryStartBondRotation();
@@ -119,9 +118,7 @@ public class InputHandler : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 选中键时按原子键，在键的末端方向创建原子
-    /// </summary>
+    // 选中键时按原子键，在键的末端方向创建原子
     private void TryCreateAtomAtSelectedBond()
     {
         GameObject selectedBond = dashedBondManager.selectedDashedBond;
@@ -132,24 +129,11 @@ public class InputHandler : MonoBehaviour
 
         if (selectedBond.CompareTag("DashedBond"))
         {
-            // 虚键：直接使用 endPosition
             DashedBondLink link = selectedBond.GetComponent<DashedBondLink>();
             if (link == null || link.linkedAtom == null) return;
 
             createPosition = link.endPosition;
             bondType = link.bondType;
-        }
-        else if (selectedBond.CompareTag("PreservedBond"))
-        {
-            // 实键：在 OriginalLinkedAtom → OriginalEndPosition 方向上创建
-            PreservedBond pb = selectedBond.GetComponent<PreservedBond>();
-            DashedBondLink link = selectedBond.GetComponent<DashedBondLink>();
-            if (pb == null || pb.OriginalLinkedAtom == null || link == null) return;
-
-            Vector3 atomPos = pb.OriginalLinkedAtom.transform.position;
-            Vector3 direction = (link.endPosition - atomPos).normalized;
-            createPosition = atomPos + direction * 1.0f; // FixedBondLength = 1.0f
-            bondType = pb.bondType;
         }
         else
         {
@@ -171,7 +155,7 @@ public class InputHandler : MonoBehaviour
         if (command.IsValid())
         {
             historyManager.ExecuteCommand(command);
-            Debug.Log($"键触发原子创建: {selectedElement.name} at {createPosition}");
+            //Debug.Log($"键触发原子创建: {selectedElement.name} at {createPosition}");
 
             // 创建后保持选中原来的原子，不切换到新原子
             GameObject newAtom = command.GetCreatedAtom();
@@ -256,7 +240,7 @@ public class InputHandler : MonoBehaviour
                     DashedBondLink link = raycastHitCache.transform.GetComponent<DashedBondLink>();
                     if (link != null && link.linkedAtom != null)
                     {
-                        Debug.Log($"[选中] 虚键: 关联原子={link.linkedAtom.name}, 末端位置=({link.endPosition.x:F2},{link.endPosition.y:F2},{link.endPosition.z:F2}), bondType={link.bondType}");
+                        //Debug.Log($"[选中] 虚键: 关联原子={link.linkedAtom.name}, 末端位置=({link.endPosition.x:F2},{link.endPosition.y:F2},{link.endPosition.z:F2}), bondType={link.bondType}");
                         Vector3 endPosition = link.endPosition;
 
                         if (selectedElement != null)
@@ -274,7 +258,7 @@ public class InputHandler : MonoBehaviour
                             if (command.IsValid())
                             {
                                 historyManager.ExecuteCommand(command);
-                                Debug.Log("虚键触发原子创建命令已记录");
+                                //Debug.Log("虚键触发原子创建命令已记录");
                             }
                             selectedElement = null;
                             uiManager.UpdateElementText(null);
@@ -309,7 +293,7 @@ public class InputHandler : MonoBehaviour
                 {
                     GameObject clickedAtom = raycastHitCache.transform.gameObject;
                     bool isSameAtom = (selectedAtom == clickedAtom);
-                    Debug.Log($"[选中] 原子: {clickedAtom.name}, 坐标=({clickedAtom.transform.position.x:F2},{clickedAtom.transform.position.y:F2},{clickedAtom.transform.position.z:F2}), 是否切换={isSameAtom}");
+                    //Debug.Log($"[选中] 原子: {clickedAtom.name}, 坐标=({clickedAtom.transform.position.x:F2},{clickedAtom.transform.position.y:F2},{clickedAtom.transform.position.z:F2}), 是否切换={isSameAtom}");
                     dashedBondManager.UnhighlightDashedBondsForAtom(clickedAtom);
 
                     selectedElement = null;
@@ -347,7 +331,7 @@ public class InputHandler : MonoBehaviour
             }
             else
             {
-                Debug.Log($"[取消选中] 点击了空白区域, 原选中原子={selectedAtom?.name ?? "null"}");
+                //Debug.Log($"[取消选中] 点击了空白区域, 原选中原子={selectedAtom?.name ?? "null"}");
                 dashedBondManager.UnselectAllBonds();
                 UIManager.Instance.UpdateSelectedInfo("");
 
@@ -734,7 +718,7 @@ public class InputHandler : MonoBehaviour
         }
 
         string debugInfo = dashedBondManager.GetDebugInfo();
-        Debug.Log("========== 原子与键调试信息 ==========\n" + debugInfo + "\n======================================");
+        //Debug.Log("========== 原子与键调试信息 ==========\n" + debugInfo + "\n======================================");
     }
 
     /// <summary>
@@ -746,7 +730,7 @@ public class InputHandler : MonoBehaviour
         if (bondRotator != null && bondRotator.IsRotating())
         {
             bondRotator.StopRotation();
-            Debug.Log("[BondRotator] 停止键旋转");
+            //Debug.Log("[BondRotator] 停止键旋转");
             return;
         }
 
@@ -764,7 +748,7 @@ public class InputHandler : MonoBehaviour
             if (bondRotator == null)
             {
                 bondRotator = gameObject.AddComponent<BondRotator>();
-                Debug.Log("[BondRotator] 已自动添加 BondRotator 组件");
+                //Debug.Log("[BondRotator] 已自动添加 BondRotator 组件");
             }
         }
 
@@ -772,7 +756,7 @@ public class InputHandler : MonoBehaviour
         if (success)
         {
             bondRotator.onStopRotation = OnBondRotationStopped;
-            Debug.Log("[BondRotator] 键旋转已启动，按住左键拖拽旋转，ESC停止");
+            //Debug.Log("[BondRotator] 键旋转已启动，按住左键拖拽旋转，ESC停止");
         }
         else
         {
@@ -785,7 +769,7 @@ public class InputHandler : MonoBehaviour
     /// </summary>
     private void OnBondRotationStopped()
     {
-        Debug.Log("[BondRotator] 旋转停止，取消选中");
+        //Debug.Log("[BondRotator] 旋转停止，取消选中");
 
         // 取消选中键
         dashedBondManager.UnselectAllBonds();
