@@ -2169,7 +2169,7 @@ public class DashedBondManager : MonoBehaviour
         }
     }
 
-    private static string GetBondTypeName(int bondType)
+    public static string GetBondTypeName(int bondType)
     {
         return bondType switch
         {

@@ -78,13 +78,7 @@ public class DebugOutputPanel : MonoBehaviour
                 GameObject startAtom = link.linkedAtom;
                 GameObject endAtom = pb?.OtherLinkedAtom;
 
-                string bondTypeName = link.bondType switch
-                {
-                    1 => "单键",
-                    2 => "双键",
-                    3 => "三键",
-                    _ => $"未知({link.bondType})"
-                };
+                string bondTypeName = DashedBondManager.GetBondTypeName(link.bondType);
 
                 sb.AppendLine($"【实键 {i + 1}】{bondTypeName}");
                 sb.AppendLine($"   起始原子: {(startAtom != null ? startAtom.name : "null")}");
@@ -114,15 +108,9 @@ public class DebugOutputPanel : MonoBehaviour
                     DashedBondLink link = dash.GetComponent<DashedBondLink>();
                     if (link == null) continue;
 
-                    string bondTypeName = link.bondType switch
-                    {
-                        1 => "单键",
-                        2 => "双键",
-                        3 => "三键",
-                        _ => $"未知({link.bondType})"
-                    };
+                string bondTypeName = DashedBondManager.GetBondTypeName(link.bondType);
 
-                    sb.AppendLine($"【虚键 {i + 1}】{bondTypeName}");
+                sb.AppendLine($"【虚键 {i + 1}】{bondTypeName}");
                     sb.AppendLine($"   关联原子: {(link.linkedAtom != null ? link.linkedAtom.name : "null")}");
                     if (link.linkedAtom != null)
                         sb.AppendLine($"   起始坐标: ({link.linkedAtom.transform.position.x:F3}, {link.linkedAtom.transform.position.y:F3}, {link.linkedAtom.transform.position.z:F3})");
