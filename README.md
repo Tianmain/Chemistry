@@ -61,13 +61,23 @@ A 3D chemistry molecule editor developed with Unity, supporting interactive crea
 
 ```
 Assets/
+├── Art/
+│   ├── Materials/
+│   │   ├── Elements/       # Per-element materials
+│   │   ├── Bonds/          # Bond materials (single/double/triple/dashed)
+│   │   └── UI/            # UI materials (highlight, glow halo)
+│   └── Shaders/           # Custom shaders
+├── Fonts/
+│   └── SourceHanSansCN/   # Chinese font (Source Han Sans)
+├── Prefabs/                # Unity prefabs
+├── Scenes/                 # Unity scene files
 ├── Scripts/
-│   ├── ChemistryEditor/     # Core editor scripts
-│   ├── History/             # Undo/redo system
-│   └── UI/                  # UI management scripts
-├── Scenes/                  # Unity scene files
-├── MaterialManager.asset    # Element material configuration
-└── SourceHanSansCN/         # Chinese font assets
+│   ├── ChemistryEditor/     # Core editor (AtomData, DashedBondManager, BondRotator…)
+│   ├── History/            # Undo/redo system (HistoryManager + Command/*)
+│   ├── Input/              # Input handling (InputHandler)
+│   ├── UI/                 # UI management (UIManager, LocalizationManager…)
+│   └── Utilities/          # Shared utilities (MaterialManager, CameraController)
+└── MaterialManager.asset  # Element material configuration
 ```
 
 ### 📝 Changelog
@@ -150,13 +160,23 @@ This project is for personal learning and research purposes only.
 
 ```
 Assets/
+├── Art/
+│   ├── Materials/
+│   │   ├── Elements/       # 元素材质
+│   │   ├── Bonds/          # 键材质（单键/双键/三键/虚线键）
+│   │   └── UI/            # UI 材质（高亮、光晕）
+│   └── Shaders/          # 自定义着色器
+├── Fonts/
+│   └── SourceHanSansCN/  # 中文字体（思源黑体）
+├── Prefabs/               # Unity 预制体
+├── Scenes/                # Unity 场景文件
 ├── Scripts/
-│   ├── ChemistryEditor/     # 核心编辑器脚本
-│   ├── History/             # 撤销重做系统
-│   └── UI/                  # UI 管理脚本
-├── Scenes/                  # Unity 场景文件
-├── MaterialManager.asset    # 元素材质配置
-└── SourceHanSansCN/         # 中文字体资源
+│   ├── ChemistryEditor/    # 核心编辑器（AtomData, DashedBondManager, BondRotator…）
+│   ├── History/           # 撤销重做系统（HistoryManager + Command/*）
+│   ├── Input/             # 输入处理（InputHandler）
+│   ├── UI/                # UI 管理（UIManager, LocalizationManager…）
+│   └── Utilities/         # 公共工具（MaterialManager, CameraController）
+└── MaterialManager.asset # 元素材质配置
 ```
 
 ### 📝 更新日志
