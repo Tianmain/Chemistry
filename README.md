@@ -9,6 +9,8 @@
 
 A 3D chemistry molecule editor developed with Unity, supporting interactive creation, editing, and visualization of atoms and chemical bonds.
 
+**📥 Download Standalone Build**: https://github.com/Tianmain/Chemistry-Setting
+
 ### ✨ Features
 
 #### Core Features
@@ -37,14 +39,7 @@ A 3D chemistry molecule editor developed with Unity, supporting interactive crea
 | Undo | `Ctrl + Z` |
 | Redo | `Ctrl + Y` |
 
-### 🛠 Tech Stack
-
-- **Engine**: Tuanjie 1.8.2
-- **Language**: C# (.NET 4.x+)
-- **Architecture**: Command Pattern for undo/redo system
-- **UI**: Unity UI (uGUI) + Chinese localization
-
-### 📦 Installation & Running
+### 📦 Installation & Running (Source Code)
 
 1. Clone the repository:
    ```bash
@@ -56,36 +51,6 @@ A 3D chemistry molecule editor developed with Unity, supporting interactive crea
 3. Open scene `Assets/Scenes/AtomCreator.unity`
 
 4. Click Play to run
-
-### 📁 Project Structure
-
-```
-Assets/
-├── Art/
-│   ├── Materials/
-│   │   ├── Elements/       # Per-element materials
-│   │   ├── Bonds/          # Bond materials (single/double/triple/dashed)
-│   │   └── UI/            # UI materials (highlight, glow halo)
-│   └── Shaders/           # Custom shaders
-├── Fonts/
-│   └── SourceHanSansCN/   # Chinese font (Source Han Sans)
-├── Prefabs/                # Unity prefabs
-├── Scenes/                 # Unity scene files
-├── Scripts/
-│   ├── ChemistryEditor/     # Core editor (AtomData, DashedBondManager, BondRotator…)
-│   ├── History/            # Undo/redo system (HistoryManager + Command/*)
-│   ├── Input/              # Input handling (InputHandler)
-│   ├── UI/                 # UI management (UIManager, LocalizationManager…)
-│   └── Utilities/          # Shared utilities (MaterialManager, CameraController)
-└── MaterialManager.asset  # Element material configuration
-```
-
-### 📝 Changelog
-
-- **2026-05** - Fixed Sulfur/Sodium material GUID conflict in MaterialManager
-- **2026-05** - Improved chemical bond rotation (R key, ESC cancel, Shift 15° snap)
-- **2026-05** - Added SaveSystemSetup Editor tool
-- **2026-04** - Initial release
 
 ### 📄 License
 
@@ -107,6 +72,8 @@ This project is for personal learning and research purposes only.
 ## 🇨🇳 中文
 
 一个基于 Unity 开发的 3D 化学分子编辑器，支持原子与化学键的交互式创建、编辑和可视化。
+
+**📥 下载独立构建版**：https://github.com/Tianmain/Chemistry-Setting
 
 ### ✨ 功能特性
 
@@ -136,14 +103,7 @@ This project is for personal learning and research purposes only.
 | 撤销 | `Ctrl + Z` |
 | 重做 | `Ctrl + Y` |
 
-### 🛠 技术栈
-
-- **引擎**: Tuanjie 1.8.2
-- **语言**: C# (.NET 4.x+)
-- **架构**: 命令模式（Command Pattern）实现撤销/重做系统
-- **UI**: Unity UI (uGUI) + 自定义中文本地化
-
-### 📦 安装运行
+### 📦 安装运行（源代码）
 
 1. 克隆仓库到本地：
    ```bash
@@ -155,36 +115,6 @@ This project is for personal learning and research purposes only.
 3. 打开场景 `Assets/Scenes/AtomCreator.unity`
 
 4. 点击 Play 运行
-
-### 📁 项目结构
-
-```
-Assets/
-├── Art/
-│   ├── Materials/
-│   │   ├── Elements/       # 元素材质
-│   │   ├── Bonds/          # 键材质（单键/双键/三键/虚线键）
-│   │   └── UI/            # UI 材质（高亮、光晕）
-│   └── Shaders/          # 自定义着色器
-├── Fonts/
-│   └── SourceHanSansCN/  # 中文字体（思源黑体）
-├── Prefabs/               # Unity 预制体
-├── Scenes/                # Unity 场景文件
-├── Scripts/
-│   ├── ChemistryEditor/    # 核心编辑器（AtomData, DashedBondManager, BondRotator…）
-│   ├── History/           # 撤销重做系统（HistoryManager + Command/*）
-│   ├── Input/             # 输入处理（InputHandler）
-│   ├── UI/                # UI 管理（UIManager, LocalizationManager…）
-│   └── Utilities/         # 公共工具（MaterialManager, CameraController）
-└── MaterialManager.asset # 元素材质配置
-```
-
-### 📝 更新日志
-
-- **2026-05** - 修复 MaterialManager 中 Sulfur/Sodium 材质 GUID 重复问题
-- **2026-05** - 完善化学键旋转交互（R 键启动、ESC 取消、Shift 15° 吸附）
-- **2026-05** - 添加 SaveSystemSetup Editor 工具
-- **2026-04** - 初始版本发布
 
 ### 📄 许可证
 
