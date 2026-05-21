@@ -1,9 +1,9 @@
 using UnityEngine;
 
 /// <summary>
-/// 记录实键创建，支持撤销/重做。
-/// Execute：创建键；Undo：删除键。
-/// 每次执行后自动刷新相邻原子的光晕状态。
+/// 记录实键创建，支持撤销/重做
+/// Execute：创建键；Undo：删除键
+/// 每次执行后自动刷新相邻原子的光晕状态
 /// </summary>
 public class CreateBondCommand : ICommand
 {
@@ -33,7 +33,7 @@ public class CreateBondCommand : ICommand
     {
         if (atom1 != null && atom2 != null && dashedBondManager != null)
         {
-            // 安全检查：确认键仍然存在（原子可能已被删除导致键被清理）
+            // 确认键仍然存在
             if (dashedBondManager.FindBondBetweenAtoms(atom1, atom2) != null)
             {
                 dashedBondManager.DeleteBondBetweenAtoms(atom1, atom2);

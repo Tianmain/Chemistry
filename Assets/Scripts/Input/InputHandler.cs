@@ -5,8 +5,8 @@ using System.Text;
 using System.Collections.Generic;
 
 /// <summary>
-/// 输入处理中心：元素选择、原子创建、选中、键类型切换、删除、撤销/重做。
-/// 同时处理键旋转模式下的输入。
+/// 输入处理中心：元素选择、原子创建、选中、键类型切换、删除、撤销/重做
+/// 同时处理键旋转模式下的输入
 /// </summary>
 public class InputHandler : MonoBehaviour
 {
@@ -421,7 +421,7 @@ public class InputHandler : MonoBehaviour
     }
 
     /// <summary>
-    /// 处理原子拖拽：选中原子后按住左键拖动，所有相连原子一起移动。
+    /// 处理原子拖拽：选中原子后按住左键拖动，所有相连原子一起移动
     /// </summary>
     private void HandleAtomDragging()
     {
@@ -667,8 +667,8 @@ public class InputHandler : MonoBehaviour
 
     private void DashedBondsVisition()
     {
-        // 虚键生成由 HandleSelection和CheckAndConvertDashedBondsToPreserved负责，此处仅同步缓存。
-        // 不在此处调用 UpdateDashedBonds，避免键类型切换时错误重建虚键。
+        // 虚键生成由 HandleSelection和CheckAndConvertDashedBondsToPreserved负责，此处仅同步缓存
+        // 不在此处调用 UpdateDashedBonds，避免键类型切换时错误重建虚键
         cachedSelectedAtom = selectedAtom;
         cachedSelectedBondType = selectedBondType;
         cachedMaxBondCount = maxBondCount;

@@ -2,8 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
-/// 历史管理器，实现撤销/重做功能。
-/// 维护撤销栈和重做栈，最大容量可在 Inspector 中配置。
+/// 历史管理器，实现撤销/重做功能
+/// 维护撤销栈和重做栈，最大容量可在 Inspector 中配置
 /// </summary>
 public class HistoryManager : MonoBehaviour
 {
@@ -122,19 +122,17 @@ public class HistoryManager : MonoBehaviour
         if (stack.Count <= maxHistorySize)
             return;
 
-        // 使用两个临时栈来移除最旧的命令，避免 List 分配
-        // Stack 是 LIFO，最旧的在底部，最新的在顶部
-        // 步骤1：将栈中元素反转（现在最新的在底部，最旧的在顶部）
+        // 将栈中元素反转
         Stack<ICommand> tempStack = new Stack<ICommand>();
         while (stack.Count > 0)
             tempStack.Push(stack.Pop());
 
-        // 步骤2：弹出多余的命令（现在顶部是最旧的）
+        // 弹出多余的命令
         int removeCount = tempStack.Count - maxHistorySize;
         for (int i = 0; i < removeCount; i++)
             tempStack.Pop();
 
-        // 步骤3：再次反转，将保留的命令压回原栈（现在最新的在顶部）
+        // 再次反转，将保留的命令压回原栈
         while (tempStack.Count > 0)
             stack.Push(tempStack.Pop());
     }

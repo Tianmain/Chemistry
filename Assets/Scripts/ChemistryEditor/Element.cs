@@ -19,7 +19,7 @@ public class Element
 
     /// <summary>
     /// 元素定义，包含名称、符号、半径、最大键数、孤电子对数和键角
-    /// 使用 VSEPR 理论计算虚键方向。
+    /// 使用 VSEPR 理论计算虚键方向
     /// </summary>
     public Element(string name, string symbol, float radius, int maxBondCount,
                    int lonePairCount = 0, float bondAngle = 109.5f)

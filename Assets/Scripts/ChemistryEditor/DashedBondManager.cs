@@ -5,8 +5,8 @@ using System;
 using System.Text;
 
 /// <summary>
-/// 管理虚键和实键的创建、转换、销毁和存档序列化。
-/// 负责虚键自动生成、自动转实键、以及键生命周期管理。
+/// 管理虚键和实键的创建、转换、销毁和存档序列化
+/// 负责虚键自动生成、自动转实键、以及键生命周期管理
 /// </summary>
 public class DashedBondManager : MonoBehaviour
 {
@@ -145,8 +145,8 @@ public class DashedBondManager : MonoBehaviour
         return set;
     }
 
-    // 获取与 startAtom 相连的原子堆，排除 excludeAtom 所在的那一侧。
-    // 用于在指定键处"切开"分子，获取旋转端原子堆。
+    // 获取与 startAtom 相连的原子堆，排除 excludeAtom 所在的那一侧
+    // 用于在指定键处"切开"分子，获取旋转端原子堆
     public HashSet<GameObject> GetConnectedAtomsExcluding(GameObject startAtom, GameObject excludeAtom)
     {
         var visited = new HashSet<GameObject>();
@@ -187,7 +187,7 @@ public class DashedBondManager : MonoBehaviour
         return visited;
     }
 
-    // 更新所有与指定原子相连的实键的 Transform。
+    // 更新所有与指定原子相连的实键的 Transform
     public void UpdateBondsForAtom(GameObject atom)
     {
         if (atom == null) return;
@@ -257,7 +257,7 @@ public class DashedBondManager : MonoBehaviour
     private int lastMaxBondCount;
     private GameObject currentDashedBondAtom;
 
-    // 刷新所有原子的虚键显示，为所有有实键连接且键未连全的原子生成虚键。
+    // 刷新所有原子的虚键显示，为所有有实键连接且键未连全的原子生成虚键
     public void RefreshAllDashedBonds(GameObject highlightedAtom = null, int highlightedBondType = 1)
     {
         // 先清除所有现有虚键
@@ -332,7 +332,7 @@ public class DashedBondManager : MonoBehaviour
         CheckAndConvertDashedBondsToPreserved();
     }
 
-    // 只生成虚键，不触发自动转换为实键。
+    // 只生成虚键，不触发自动转换为实键
     private void UpdateDashedBondsInternal(GameObject selectedAtom, int selectedBondType, int maxBondCount)
     {
         ClearDashedBonds();
@@ -340,7 +340,7 @@ public class DashedBondManager : MonoBehaviour
         GenerateDashedBondsFor(selectedAtom, selectedBondType, maxBondCount);
     }
 
-    // 只为指定原子生成虚键，不清除全局虚键。
+    // 只为指定原子生成虚键，不清除全局虚键
     private void UpdateDashedBondsLocal(GameObject atom, int bondType, int maxBondCount)
     {
         if (atom == null) return;
@@ -844,7 +844,7 @@ public class DashedBondManager : MonoBehaviour
         if (data2 != null) data2.usedBonds += bondType;
     }
 
-    // 批量转换完成后，统一刷新受影响原子的虚键显示。
+    // 批量转换完成后，统一刷新受影响原子的虚键显示
     private void RefreshDashedBondsForAffectedAtoms(List<(GameObject dashedBond, GameObject endAtom)> bondsToConvert)
     {
         var affectedAtoms = new HashSet<GameObject>();
@@ -872,7 +872,7 @@ public class DashedBondManager : MonoBehaviour
         }
     }
 
-    // 创建/恢复原子并自动成键后，立即刷新受影响原子的光晕状态。
+    // 创建/恢复原子并自动成键后，立即刷新受影响原子的光晕状态
     private void RefreshGlowForAffectedAtoms(List<(GameObject dashedBond, GameObject endAtom)> bondsToConvert)
     {
         if (atomManager == null) return;

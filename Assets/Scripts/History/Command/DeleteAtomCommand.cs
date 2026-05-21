@@ -2,8 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
-/// 记录原子删除，支持撤销/重做。
-/// Execute：删除原子及相连键；Undo：重建原子并恢复键。
+/// 记录原子删除，支持撤销/重做
+/// Execute：删除原子及相连键；Undo：重建原子并恢复键
 /// </summary>
 public class DeleteAtomCommand : ICommand
 {
@@ -32,17 +32,15 @@ public class DeleteAtomCommand : ICommand
         }
     }
 
-    /// <summary>
-    /// 执行命令：删除原子。
-    /// </summary>
+    // 删除原子
     public void Execute()
     {
-        // 先收集受影响的相邻原子（键删除后 usedBonds 会减少）
+        // 先收集受影响的相邻原子
         List<GameObject> affectedNeighbors = dashedBondManager.DeletePreservedBondsForAtom(targetAtom);
         dashedBondManager.ClearDashedBondsForAtom(targetAtom);
         atomManager.DeleteAtom(targetAtom);
 
-        // 更新相邻原子的光晕状态（键断开后可能需要显示红色光晕）
+        // 更新相邻原子的光晕状态
         foreach (GameObject neighbor in affectedNeighbors)
         {
             if (neighbor != null)
@@ -50,9 +48,7 @@ public class DeleteAtomCommand : ICommand
         }
     }
 
-    /// <summary>
-    /// 撤销命令：重建原子。
-    /// </summary>
+    // 重建原子
     public void Undo()
     {
         if (element == null)
@@ -71,7 +67,7 @@ public class DeleteAtomCommand : ICommand
                 atomData.usedBonds = usedBonds;
             }
 
-            // 局部刷新：只为恢复的原子生成虚键并自动转换，不影响其他原子的虚键
+            // 只为恢复的原子生成虚键并自动转换，不影响其他原子的虚键
             dashedBondManager.RefreshForRestoredAtom(targetAtom, usedBonds, element.maxBondCount);
         }
 
@@ -79,9 +75,7 @@ public class DeleteAtomCommand : ICommand
         atomManager.RefreshAllAtomGlows();
     }
 
-    /// <summary>
-    /// 检查命令是否有效（目标原子不为空）。
-    /// </summary>
+    // 检查命令是否有效
     public bool IsValid()
     {
         return targetAtom != null && element != null;

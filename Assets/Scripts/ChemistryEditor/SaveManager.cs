@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 
 /// <summary>
-/// 管理分子结构存档的保存/加载/删除。
-/// 所有存档为 JSON 文件，存储在 Saves 目录。
+/// 管理分子结构存档的保存/加载/删除
+/// 所有存档为 JSON 文件，存储在 Saves 目录
 /// </summary>
 public class SaveManager : MonoBehaviour
 {

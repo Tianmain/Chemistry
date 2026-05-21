@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 [CreateAssetMenu(fileName = "MaterialManager", menuName = "Chemistry/Material Manager")]
 /// <summary>
-/// 材质管理器，为每种元素提供对应的 Material。
-/// 在 Inspector 中配置，供 AtomManager 使用。
+/// 材质管理器，为每种元素提供对应的 Material
+/// 在 Inspector 中配置，供 AtomManager 使用
 /// </summary>
 public class MaterialManager : ScriptableObject
 {

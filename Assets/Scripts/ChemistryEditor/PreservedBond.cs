@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Diagnostics;
 
 /// <summary>
-/// 实键组件，记录键两端原子及键类型，管理双向键引用。
+/// 实键组件，记录键两端原子及键类型，管理双向键引用
 /// </summary>
 public class PreservedBond : MonoBehaviour
 {

@@ -17,9 +17,7 @@ public class CreateAtomCommand : ICommand
         this.wasExecuted = false;
     }
 
-    /// <summary>
-    /// 执行命令：创建原子。
-    /// </summary>
+    // 创建原子
     public void Execute()
     {
         if (createdAtom == null)
@@ -30,9 +28,7 @@ public class CreateAtomCommand : ICommand
         }
     }
 
-    /// <summary>
-    /// 撤销命令：删除原子。
-    /// </summary>
+    // 删除原子
     public void Undo()
     {
         if (createdAtom != null && wasExecuted)
@@ -44,17 +40,13 @@ public class CreateAtomCommand : ICommand
         }
     }
 
-    /// <summary>
-    /// 检查命令是否有效（位置未被占用）。
-    /// </summary>
+    // 检查命令是否有效
     public bool IsValid()
     {
         return !atomManager.CheckAtomOverlap(position);
     }
 
-    /// <summary>
-    /// 获取已创建的原子（供外部使用）。
-    /// </summary>
+    // 获取已创建的原子
     public GameObject GetCreatedAtom()
     {
         return createdAtom;

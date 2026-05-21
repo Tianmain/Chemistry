@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 /// <summary>
-/// 管理所有原子的创建、高亮、光晕和销毁。
-/// 同时维护原子与光晕 GameObject 的映射。
+/// 管理所有原子的创建、高亮、光晕和销毁
+/// 同时维护原子与光晕 GameObject 的映射
 /// </summary>
 public class AtomManager : MonoBehaviour
 {
@@ -189,8 +189,8 @@ public class AtomManager : MonoBehaviour
         UpdateAtomGlow(atom);
     }
 
-    // 根据原子的键连接情况更新光晕信号。
-    // 键没连全，显示红色光晕壳；键已连全，移除光晕壳。
+    // 根据原子的键连接情况更新光晕信号
+    // 键没连全，显示红色光晕壳；键已连全，移除光晕壳
     public void UpdateAtomGlow(GameObject atom)
     {
         if (atom == null) return;

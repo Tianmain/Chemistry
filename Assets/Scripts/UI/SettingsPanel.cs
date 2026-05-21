@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// 设置面板：语言切换、旋转/移动/缩放速度调节。
+/// 设置面板：语言切换、旋转/移动/缩放速度调节
 /// </summary>
 public class SettingsPanel : MonoBehaviour
 {

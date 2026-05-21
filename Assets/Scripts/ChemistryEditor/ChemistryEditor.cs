@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// 化学编辑器入口，初始化 UI 文本。
+/// 化学编辑器入口，初始化 UI 文本
 /// </summary>
 public class ChemistryEditor : MonoBehaviour
 {

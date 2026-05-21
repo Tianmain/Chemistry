@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 /// <summary>
 /// 键旋转功能：选中实键后按 R 键进入旋转模式，
-/// 按住左键拖拽旋转，带动原子数较少的那端原子堆一起旋转。
+/// 按住左键拖拽旋转，带动原子数较少的那端原子堆一起旋转
 /// </summary>
 public class BondRotator : MonoBehaviour
 {
@@ -102,7 +102,7 @@ public class BondRotator : MonoBehaviour
         _currentAngle = 0f;
         _isDragging = false;
 
-        //Debug.Log($"[BondRotator] 旋转端: {_rotateAtom.name}, 固定端: {_fixedAtom.name}, 需旋转 {_rotateAtoms.Count} 个原子。按住左键拖拽旋转，ESC停止。");
+        //Debug.Log($"[BondRotator] 旋转端: {_rotateAtom.name}, 固定端: {_fixedAtom.name}, 需旋转 {_rotateAtoms.Count} 个原子，按住左键拖拽旋转，ESC停止");
         return true;
     }
 
