@@ -668,6 +668,10 @@ public class DashedBondManager : MonoBehaviour
         AddBondToAtomIndex(bond);
         RemoveDuplicatePreservedBond(bond, startAtom, endAtom);
 
+        // 强制刷新相关原子所有实键的材质，防止被错误覆盖
+        ForceCorrectPreservedBondMaterials(startAtom);
+        ForceCorrectPreservedBondMaterials(endAtom);
+
         return bond;
     }
 
@@ -708,6 +712,30 @@ public class DashedBondManager : MonoBehaviour
 
             preservedBonds.RemoveAt(i);
             Destroy(existing);
+        }
+    }
+
+    // 强制刷新指定原子所有实键的材质，防止被错误覆盖
+    private void ForceCorrectPreservedBondMaterials(GameObject atom)
+    {
+        if (atom == null) return;
+        if (!atomToPreservedBonds.ContainsKey(atom)) return;
+
+        foreach (var bond in atomToPreservedBonds[atom])
+        {
+            if (bond == null) continue;
+            PreservedBond pb = bond.GetComponent<PreservedBond>();
+            if (pb == null) continue;
+
+            Renderer renderer = bond.GetComponent<Renderer>();
+            if (renderer == null) continue;
+
+            switch (pb.bondType)
+            {
+                case 1: renderer.material = materialManager.singleBondMaterial; break;
+                case 2: renderer.material = materialManager.doubleBondMaterial; break;
+                case 3: renderer.material = materialManager.tripleBondMaterial; break;
+            }
         }
     }
 
@@ -862,6 +890,10 @@ public class DashedBondManager : MonoBehaviour
             AtomData data = atom.GetComponent<AtomData>();
             if (data != null && data.element != null)
             {
+                // 已有实键的原子，键型不应被改变，跳过虚键刷新
+                if (HasPreservedBondForAtom(atom))
+                    continue;
+
                 ClearDashedBondsForAtom(atom);
                 int remaining = data.element.maxBondCount - data.usedBonds;
 
