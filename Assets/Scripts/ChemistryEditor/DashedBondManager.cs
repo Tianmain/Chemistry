@@ -161,6 +161,51 @@ public class DashedBondManager : MonoBehaviour
     }
 
     /// <summary>
+    /// 获取与 startAtom 相连的原子堆，但排除 excludeAtom 所在的那一侧。
+    /// 用于在指定键处"切开"分子，获取旋转端原子堆。
+    /// 实现：BFS 遍历时，遇到 excludeAtom 则跳过该邻居，不继续向另一侧扩散。
+    /// </summary>
+    public HashSet<GameObject> GetConnectedAtomsExcluding(GameObject startAtom, GameObject excludeAtom)
+    {
+        var visited = new HashSet<GameObject>();
+        if (startAtom == null) return visited;
+
+        var queue = new Queue<GameObject>();
+        queue.Enqueue(startAtom);
+        visited.Add(startAtom);
+
+        while (queue.Count > 0)
+        {
+            GameObject current = queue.Dequeue();
+
+            if (!atomToPreservedBonds.ContainsKey(current))
+                continue;
+
+            foreach (var bond in atomToPreservedBonds[current])
+            {
+                if (bond == null) continue;
+                PreservedBond pb = bond.GetComponent<PreservedBond>();
+                if (pb == null) continue;
+
+                GameObject neighbor = null;
+                if (pb.OriginalLinkedAtom == current)
+                    neighbor = pb.OtherLinkedAtom;
+                else if (pb.OtherLinkedAtom == current)
+                    neighbor = pb.OriginalLinkedAtom;
+
+                // 关键：遇到 excludeAtom 时跳过，不向另一侧扩散
+                if (neighbor != null && neighbor != excludeAtom && !visited.Contains(neighbor))
+                {
+                    visited.Add(neighbor);
+                    queue.Enqueue(neighbor);
+                }
+            }
+        }
+
+        return visited;
+    }
+
+    /// <summary>
     /// 更新所有与指定原子相连的实键的 Transform。
     /// 原子移动后调用此方法来更新键的显示位置。
     /// </summary>

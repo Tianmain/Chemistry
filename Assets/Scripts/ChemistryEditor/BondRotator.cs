@@ -73,9 +73,9 @@ public class BondRotator : MonoBehaviour
             return false;
         }
 
-        // 计算两端的原子堆大小
-        HashSet<GameObject> pile1 = GetConnectedAtoms(atom1, atom2);
-        HashSet<GameObject> pile2 = GetConnectedAtoms(atom2, atom1);
+        // 计算两端的原子堆大小（以键为界，只取一侧）
+        HashSet<GameObject> pile1 = _bondManager.GetConnectedAtomsExcluding(atom1, atom2);
+        HashSet<GameObject> pile2 = _bondManager.GetConnectedAtomsExcluding(atom2, atom1);
 
         Debug.Log($"[BondRotator] 键旋转: {atom1.name} 端 {pile1.Count} 个原子, {atom2.name} 端 {pile2.Count} 个原子");
 
@@ -123,18 +123,6 @@ public class BondRotator : MonoBehaviour
 
         // 触发停止事件（InputHandler 会订阅此事件来取消选中）
         onStopRotation?.Invoke();
-    }
-
-    /// <summary>
-    /// 获取与指定原子相连的所有原子（排除 excludeAtom）
-    /// 优化：使用 DashedBondManager 的索引，避免遍历全部键
-    /// </summary>
-    private HashSet<GameObject> GetConnectedAtoms(GameObject startAtom, GameObject excludeAtom)
-    {
-        var connected = _bondManager.GetConnectedAtomsHashSet(startAtom);
-        if (excludeAtom != null && connected.Contains(excludeAtom))
-            connected.Remove(excludeAtom);
-        return connected;
     }
 
     /// <summary>
