@@ -45,11 +45,21 @@ public class InputHandler : MonoBehaviour
     // 预分配 RaycastHit
     private RaycastHit raycastHitCache;
 
+<<<<<<< HEAD
     // 触摸输入状态（桌面版预留，移动端由 MobileInputHandler 处理）
+=======
+    // 触摸输入状态
+    private bool useTouchInput = false;
+    private bool isTouchDragging = false;
+>>>>>>> 979bbce36c5c826461f490ce669980a89adc3852
     private Vector3 touchDragStartWorldPos;
     private Vector3 touchDragStartAtomPos;
     private List<GameObject> touchDraggingConnectedAtoms;
     private Vector3[] touchDraggingOffsets;
+<<<<<<< HEAD
+=======
+    private int activeTouchId = -1;
+>>>>>>> 979bbce36c5c826461f490ce669980a89adc3852
 
     private void Awake()
     {
