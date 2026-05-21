@@ -8,11 +8,11 @@ public class UIManager : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI elementText;
     [SerializeField] private TextMeshProUGUI keyMapText;
-    [SerializeField] private TextMeshProUGUI selectedInfoText;
+    [SerializeField] private TextMeshProUGUI debugText;
     [SerializeField] private RectTransform selectedInfoRect;
 
     [SerializeField] private Button aboutButton;
-    [SerializeField] private Button helpButton;
+    [SerializeField] private Button atomButton;
     private bool isHelpVisible = false;
 
     [SerializeField] private SettingsPanel settingsPanel;
@@ -48,10 +48,10 @@ public class UIManager : MonoBehaviour
 
     public void UpdateSelectedInfo(string content)
     {
-        if (selectedInfoText != null)
+        if (debugText != null)
         {
             string template = LocalizationManager.Instance.GetLocalizedText("selected_info");
-            selectedInfoText.text = string.Format(template, content);
+            debugText.text = string.Format(template, content);
         }
     }
 
