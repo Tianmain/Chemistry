@@ -18,7 +18,7 @@ MonoBehaviour:
   nitrogen: {fileID: 2100000, guid: e75ae8ec098ccc94d916350f18a99fc0, type: 2}
   oxygen: {fileID: 2100000, guid: df84a1d391e10774b816de04c1f5e95b, type: 2}
   fluorine: {fileID: 2100000, guid: c78c8a3ee9a604c4abde10ee042f6cce, type: 2}
-  sodium: {fileID: 2100000, guid: b897ec9ae7919504891edfc8233897e9, type: 2}
+  sodium: {fileID: 2100000, guid: db9ae3adc1ec26d4eb816ad49e1de0f3, type: 2}
   magnesium: {fileID: 2100000, guid: ed08b87d170291e4587314ee39212fde, type: 2}
   aluminum: {fileID: 2100000, guid: 4a80ede83bd649e4c897356ae5ac89e8, type: 2}
   silicon: {fileID: 2100000, guid: fe1d4384f17d86c45bfd984b4e6971d8, type: 2}
@@ -34,3 +34,94 @@ MonoBehaviour:
   tripleBondMaterial: {fileID: 2100000, guid: 6e01827391035d44bb597a1116018c39, type: 2}
   dashedBondMaterial: {fileID: 2100000, guid: caaf2c72888011b4291c49273e9ce52d, type: 2}
   dashedBondHighlightMaterial: {fileID: 2100000, guid: 28852fdca54ee6943a85d5dca18a7a87, type: 2}
+  elements:
+  - name: Hydrogen
+    symbol: H
+    radius: 0.5
+    maxBondCount: 1
+    lonePairCount: 3
+    bondAngle: 109.5
+  - name: Lithium
+    symbol: Li
+    radius: 0.8
+    maxBondCount: 1
+    lonePairCount: 0
+    bondAngle: 109.5
+  - name: Carbon
+    symbol: C
+    radius: 0.7
+    maxBondCount: 4
+    lonePairCount: 0
+    bondAngle: 109.5
+  - name: Nitrogen
+    symbol: N
+    radius: 0.6
+    maxBondCount: 3
+    lonePairCount: 1
+    bondAngle: 107
+  - name: Oxygen
+    symbol: O
+    radius: 0.5
+    maxBondCount: 2
+    lonePairCount: 2
+    bondAngle: 104.5
+  - name: Fluorine
+    symbol: F
+    radius: 0.4
+    maxBondCount: 1
+    lonePairCount: 3
+    bondAngle: 109.5
+  - name: Sodium
+    symbol: Na
+    radius: 0.9
+    maxBondCount: 1
+    lonePairCount: 0
+    bondAngle: 109.5
+  - name: Magnesium
+    symbol: Mg
+    radius: 0.8
+    maxBondCount: 2
+    lonePairCount: 2
+    bondAngle: 104.5
+  - name: Aluminum
+    symbol: Al
+    radius: 0.7
+    maxBondCount: 3
+    lonePairCount: 1
+    bondAngle: 107
+  - name: Silicon
+    symbol: Si
+    radius: 0.6
+    maxBondCount: 4
+    lonePairCount: 0
+    bondAngle: 109.5
+  - name: Phosphorus
+    symbol: P
+    radius: 0.5
+    maxBondCount: 3
+    lonePairCount: 1
+    bondAngle: 107
+  - name: Sulfur
+    symbol: S
+    radius: 0.6
+    maxBondCount: 2
+    lonePairCount: 2
+    bondAngle: 104.5
+  - name: Chlorine
+    symbol: Cl
+    radius: 0.5
+    maxBondCount: 1
+    lonePairCount: 3
+    bondAngle: 109.5
+  - name: Potassium
+    symbol: K
+    radius: 0.8
+    maxBondCount: 1
+    lonePairCount: 0
+    bondAngle: 109.5
+  - name: Calcium
+    symbol: Ca
+    radius: 0.9
+    maxBondCount: 2
+    lonePairCount: 2
+    bondAngle: 104.5

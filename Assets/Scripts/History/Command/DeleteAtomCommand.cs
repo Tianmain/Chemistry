@@ -1,11 +1,11 @@
+using UnityEngine;
+using System.Collections.Generic;
+
 /// <summary>
 /// 记录原子删除，支持撤销/重做。
 /// Execute：删除原子及相连键；Undo：重建原子并恢复键。
 /// </summary>
-using UnityEngine;
-using System.Collections.Generic;
-
-public class DeleteAtomCommand : ICommand>
+public class DeleteAtomCommand : ICommand
 {
     private AtomManager atomManager;
     private DashedBondManager dashedBondManager;

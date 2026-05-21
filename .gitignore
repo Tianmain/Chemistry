@@ -44,5 +44,10 @@ Builds/
 Thumbs.db
 desktop.ini
 
+# Project-specific
+Saves/
+__pycache__/
+add_summary.py
+
 # Asset meta data should generally be included, but large binary files should use Git LFS
 # See: https://docs.unity3d.com/Manual/ExternalVersionControlSystemSupport.html

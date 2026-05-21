@@ -1,10 +1,6 @@
-/// <summary>
-/// 记录原子创建，支持撤销/重做。
-/// Execute：创建原子；Undo：删除原子。
-/// </summary>
 using UnityEngine;
 
-public class CreateAtomCommand : ICommand>
+public class CreateAtomCommand : ICommand
 {
     private AtomManager atomManager;
     private Element element;
