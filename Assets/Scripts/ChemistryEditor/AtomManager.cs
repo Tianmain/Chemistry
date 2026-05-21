@@ -42,7 +42,7 @@ public class AtomManager : MonoBehaviour
 
     public GameObject CreateAtom(Vector3 position, Element element)
     {
-        Debug.Log($"尝试创建 {element.name} 原子，位置: {position}");
+        //Debug.Log($"尝试创建 {element.name} 原子，位置: {position}");
 
         if (IsPositionOccupied(position, element.radius))
         {
@@ -87,7 +87,7 @@ public class AtomManager : MonoBehaviour
         data.usedBonds = 0;
 
         atoms.Add(atom);
-        Debug.Log($"原子 {element.name} 创建成功，ID: {atom.GetInstanceID()}");
+        //Debug.Log($"原子 {element.name} 创建成功，ID: {atom.GetInstanceID()}");
 
         return atom;
     }
@@ -96,10 +96,10 @@ public class AtomManager : MonoBehaviour
     {
         if (atom == null) return;
 
-        // 1. 清理光晕
+        // 清理光晕
         HideGlowHalo(atom);
 
-        // 2. 清理与原子相连的键（先实键转虚键，再清理虚键）
+        // 清理与原子相连的键
         if (dashedBondManager != null)
         {
             // 将实键转换回虚键
@@ -109,7 +109,7 @@ public class AtomManager : MonoBehaviour
             dashedBondManager.ClearDashedBondsForAtom(atom);
         }
 
-        // 3. 从列表和映射中移除，并销毁
+        // 从列表和映射中移除，并销毁
         if (atomToParentMap.ContainsKey(atom))
         {
             GameObject parent = atomToParentMap[atom];
@@ -124,9 +124,7 @@ public class AtomManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 立即销毁所有原子并清空内部列表（用于场景加载前清空，避免 Destroy 延迟导致重叠检测失败）
-    /// </summary>
+    // 立即销毁所有原子并清空内部列表
     public void ClearAllImmediate()
     {
         // 立即销毁所有光晕
@@ -137,14 +135,14 @@ public class AtomManager : MonoBehaviour
         }
         atomToGlowMap.Clear();
 
-        // 立即销毁所有原子（通过 parent）
+        // 立即销毁所有原子
         foreach (var atom in atoms)
         {
             if (atom == null) continue;
             if (atomToParentMap.TryGetValue(atom, out var parent))
             {
                 if (parent != null)
-                    DestroyImmediate(parent); // 销毁 parent 会自动销毁 child atom
+                    DestroyImmediate(parent);
             }
             else
             {
@@ -156,9 +154,7 @@ public class AtomManager : MonoBehaviour
         atomToParentMap.Clear();
     }
 
-    /// <summary>
-    /// 获取当前所有原子（供 SaveManager 存档用）
-    /// </summary>
+    // 获取当前所有原子
     public List<GameObject> GetAllAtoms() => atoms;
 
     public GameObject GetParentObject(GameObject atom)
@@ -193,10 +189,8 @@ public class AtomManager : MonoBehaviour
         UpdateAtomGlow(atom);
     }
 
-    /// <summary>
-    /// 根据原子的键连接情况更新光晕信号。
-    /// 键没连全（有虚键/未满足的键位）→ 显示红色光晕壳；键已连全 → 移除光晕壳。
-    /// </summary>
+    // 根据原子的键连接情况更新光晕信号。
+    // 键没连全，显示红色光晕壳；键已连全，移除光晕壳。
     public void UpdateAtomGlow(GameObject atom)
     {
         if (atom == null) return;
@@ -212,9 +206,7 @@ public class AtomManager : MonoBehaviour
             HideGlowHalo(atom);
     }
 
-    /// <summary>
-    /// 在原子外显示红色光晕壳
-    /// </summary>
+    // 在原子外显示红色光晕壳
     private void ShowGlowHalo(GameObject atom)
     {
         // 已有光晕则不重复创建
@@ -224,16 +216,15 @@ public class AtomManager : MonoBehaviour
         Material glowMat = materialManager != null ? materialManager.glowHaloMaterial : null;
         if (glowMat == null)
         {
-            Debug.LogWarning("GlowHalo 材质未配置，请在 MaterialManager 中设置 glowHaloMaterial");
+            Debug.LogWarning("GlowHalo 材质未配置");
             return;
         }
 
         // 创建光晕球体，比原子稍大
         GameObject glow = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         glow.name = "GlowHalo";
-        glow.tag = "Untagged";
 
-        // 移除碰撞体，光晕不需要物理交互
+        // 移除碰撞体
         Collider col = glow.GetComponent<Collider>();
         if (col != null) Destroy(col);
 
@@ -249,9 +240,7 @@ public class AtomManager : MonoBehaviour
         atomToGlowMap[atom] = glow;
     }
 
-    /// <summary>
-    /// 移除原子的光晕壳
-    /// </summary>
+    // 移除原子的光晕壳
     private void HideGlowHalo(GameObject atom)
     {
         if (atomToGlowMap.TryGetValue(atom, out GameObject glow) && glow != null)
@@ -261,9 +250,7 @@ public class AtomManager : MonoBehaviour
         atomToGlowMap.Remove(atom);
     }
 
-    /// <summary>
-    /// 刷新所有原子的光晕状态（用于撤销等批量操作后）
-    /// </summary>
+    // 刷新所有原子的光晕状态
     public void RefreshAllAtomGlows()
     {
         foreach (GameObject atom in atoms)
@@ -275,7 +262,7 @@ public class AtomManager : MonoBehaviour
 
     private bool IsPositionOccupied(Vector3 position, float radius)
     {
-        // 预分配数组，避免 Physics.OverlapSphere 导致 TLS 堆栈内存泄漏
+        // 预分配数组
         int count = Physics.OverlapSphereNonAlloc(position, radius * 0.5f, overlapSphereBuffer);
         for (int i = 0; i < count; i++)
         {
@@ -293,7 +280,7 @@ public class AtomManager : MonoBehaviour
         if (atomData != null && atomData.element != null)
             return atomData.element;
 
-        // 兜底：如果 AtomData 不存在，才使用名称匹配（兼容旧逻辑）
+        // 如果 AtomData 不存在，使用名称匹配
         Debug.LogWarning($"[AtomManager] 原子 {atom.name} 缺少 AtomData 组件，使用名称匹配");
         return atom.name switch
         {

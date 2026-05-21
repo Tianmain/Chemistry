@@ -14,9 +14,7 @@ public class DashedBondManager : MonoBehaviour
     [SerializeField] private AtomManager atomManager;
     [SerializeField] private HistoryManager historyManager;
 
-    /// <summary>
-    /// 供 Command 类访问 AtomManager，用于刷新光晕等。
-    /// </summary>
+    // 供 Command 类访问 AtomManager
     public AtomManager AtomMgr => atomManager;
 
     private List<GameObject> dashedBonds = new List<GameObject>();
@@ -28,7 +26,7 @@ public class DashedBondManager : MonoBehaviour
     private List<GameObject> dashedBondsPool = new List<GameObject>();
     private HashSet<GameObject> activeBonds = new HashSet<GameObject>();
 
-    // 预分配碰撞检测数组，避免 Physics.OverlapSphere 每次在 TLS 堆栈上分配新数组（导致 137B 泄漏）
+    // 预分配碰撞检测数组
     private Collider[] overlapSphereBuffer = new Collider[16];
 
     private float lastCleanupTime = 0f;
@@ -37,18 +35,14 @@ public class DashedBondManager : MonoBehaviour
     public List<GameObject> preservedBonds = new List<GameObject>();
     [SerializeField] public Material preservedBondMaterial;
 
-    // 原子→相连实键 索引，避免 BFS 中每次遍历全部键
+    // 原子相连实键索引
     private Dictionary<GameObject, List<GameObject>> atomToPreservedBonds =
         new Dictionary<GameObject, List<GameObject>>();
 
-    /// <summary>
-    /// 供 SaveManager 获取所有实键（存档用）
-    /// </summary>
+    // 供 SaveManager 获取所有实键
     public List<GameObject> GetAllPreservedBonds() => preservedBonds;
 
-    /// <summary>
-    /// 将键加入原子→相连实键 索引字典
-    /// </summary>
+    // 将键加入原子相连实键索引字典
     private void AddBondToAtomIndex(GameObject bond)
     {
         if (bond == null) return;
@@ -75,9 +69,7 @@ public class DashedBondManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 将键从原子→相连实键 索引字典中移除
-    /// </summary>
+    // 将键从原子相连实键索引字典中移除
     private void RemoveBondFromAtomIndex(GameObject bond)
     {
         if (bond == null) return;
@@ -102,11 +94,7 @@ public class DashedBondManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 获取与指定原子相连的所有原子（连通分量，BFS 遍历）
-    /// 用于实现拖拽原子时整个分子一起移动。
-    /// 优化：使用 atomToPreservedBonds 索引，避免每次遍历全部键。
-    /// </summary>
+    // 获取与指定原子相连的所有原子
     public List<GameObject> GetConnectedAtoms(GameObject startAtom)
     {
         if (startAtom == null) return new List<GameObject>();
@@ -123,7 +111,6 @@ public class DashedBondManager : MonoBehaviour
             GameObject current = queue.Dequeue();
             connected.Add(current);
 
-            // 使用索引字典快速查找与当前原子相连的键
             if (!atomToPreservedBonds.ContainsKey(current))
                 continue;
 
@@ -150,9 +137,7 @@ public class DashedBondManager : MonoBehaviour
         return connected;
     }
 
-    /// <summary>
-    /// 获取与指定原子相连的所有原子（返回 HashSet，供 BondRotator 使用）
-    /// </summary>
+    // 获取与指定原子相连的所有原子
     public HashSet<GameObject> GetConnectedAtomsHashSet(GameObject startAtom)
     {
         var list = GetConnectedAtoms(startAtom);
@@ -160,11 +145,8 @@ public class DashedBondManager : MonoBehaviour
         return set;
     }
 
-    /// <summary>
-    /// 获取与 startAtom 相连的原子堆，但排除 excludeAtom 所在的那一侧。
-    /// 用于在指定键处"切开"分子，获取旋转端原子堆。
-    /// 实现：BFS 遍历时，遇到 excludeAtom 则跳过该邻居，不继续向另一侧扩散。
-    /// </summary>
+    // 获取与 startAtom 相连的原子堆，排除 excludeAtom 所在的那一侧。
+    // 用于在指定键处"切开"分子，获取旋转端原子堆。
     public HashSet<GameObject> GetConnectedAtomsExcluding(GameObject startAtom, GameObject excludeAtom)
     {
         var visited = new HashSet<GameObject>();
@@ -193,7 +175,7 @@ public class DashedBondManager : MonoBehaviour
                 else if (pb.OtherLinkedAtom == current)
                     neighbor = pb.OriginalLinkedAtom;
 
-                // 关键：遇到 excludeAtom 时跳过，不向另一侧扩散
+                //  excludeAtom 时，不向另一侧扩散
                 if (neighbor != null && neighbor != excludeAtom && !visited.Contains(neighbor))
                 {
                     visited.Add(neighbor);
@@ -205,10 +187,7 @@ public class DashedBondManager : MonoBehaviour
         return visited;
     }
 
-    /// <summary>
-    /// 更新所有与指定原子相连的实键的 Transform。
-    /// 原子移动后调用此方法来更新键的显示位置。
-    /// </summary>
+    // 更新所有与指定原子相连的实键的 Transform。
     public void UpdateBondsForAtom(GameObject atom)
     {
         if (atom == null) return;
@@ -240,9 +219,7 @@ public class DashedBondManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 更新所有实键的 Transform（全量刷新，用于批量移动原子后）
-    /// </summary>
+    // 更新所有实键的 Transform
     public void UpdateAllBondTransforms()
     {
         foreach (var bond in preservedBonds)
@@ -267,62 +244,9 @@ public class DashedBondManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// ContextMenu：强制所有保留键可见（修复 activeSelf 未勾选的问题）
-    /// </summary>
-    [ContextMenu("Force Visible Preserved Bonds")]
-    private void ForceVisiblePreservedBonds()
-    {
-        int fixedCount = 0;
-        foreach (var bond in preservedBonds)
-        {
-            if (bond == null) continue;
-
-            bond.transform.SetParent(null);
-            bond.layer = 0;
-            bond.SetActive(false);
-            bond.SetActive(true);
-
-            Renderer r = bond.GetComponent<Renderer>();
-            if (r != null)
-            {
-                r.enabled = true;
-#if UNITY_2021_1_OR_NEWER
-                r.forceRenderingOff = false;
-#endif
-                DashedBondLink link = bond.GetComponent<DashedBondLink>();
-                if (link != null && materialManager != null)
-                {
-                    switch (link.bondType)
-                    {
-                        case 1: r.material = materialManager.singleBondMaterial; break;
-                        case 2: r.material = materialManager.doubleBondMaterial; break;
-                        case 3: r.material = materialManager.tripleBondMaterial; break;
-                    }
-                }
-            }
-
-            string parentInfo = bond.transform.parent != null ? bond.transform.parent.name : "null";
-            string materialName = r?.material != null ? r.material.name : "NULL(!)";
-            string meshInfo = "";
-            MeshRenderer mr = bond.GetComponent<MeshRenderer>();
-            if (mr != null)
-            {
-                meshInfo = $", castShadow:{mr.shadowCastingMode}, recvShadow:{mr.receiveShadows}, lightmap:{mr.lightmapIndex}";
-            }
-            Debug.Log($"[ForceVisible] {bond.name} | activeSelf:{bond.activeSelf}, inHierarchy:{bond.activeInHierarchy}" +
-                      $", parent:{parentInfo}, renderer.enabled:{r?.enabled}, material:{materialName}{meshInfo}");
-
-            if (bond.activeSelf) fixedCount++;
-        }
-        Debug.Log($"[ForceVisible] 完成！共 {preservedBonds.Count} 根键，修复 {fixedCount} 根。请在 Scene 视图查看。");
-    }
-
     public GameObject selectedDashedBond;
 
-    /// <summary>
-    /// 检查当前选中的键是否为实键
-    /// </summary>
+    // 检查当前选中的键是否为实键
     public bool IsSelectedBondPreserved()
     {
         return selectedDashedBond != null && selectedDashedBond.CompareTag("PreservedBond");
@@ -333,12 +257,7 @@ public class DashedBondManager : MonoBehaviour
     private int lastMaxBondCount;
     private GameObject currentDashedBondAtom;
 
-    /// <summary>
-    /// 刷新所有原子的虚键显示：为所有有实键连接且键未连全的原子生成虚键。
-    /// 不需要选中原子即可看到虚键。选中的原子即使没有实键也会显示虚键。
-    /// </summary>
-    /// <param name="highlightedAtom">当前选中的原子（可选），其虚键会使用指定的 bondType</param>
-    /// <param name="highlightedBondType">选中原子的键类型</param>
+    // 刷新所有原子的虚键显示，为所有有实键连接且键未连全的原子生成虚键。
     public void RefreshAllDashedBonds(GameObject highlightedAtom = null, int highlightedBondType = 1)
     {
         // 先清除所有现有虚键
@@ -357,7 +276,7 @@ public class DashedBondManager : MonoBehaviour
             if (pb.OtherLinkedAtom != null) atomsWithBonds.Add(pb.OtherLinkedAtom);
         }
 
-        // 选中的原子也需要显示虚键（即使没有实键连接）
+        // 选中的原子也需要显示虚键
         if (highlightedAtom != null)
             atomsWithBonds.Add(highlightedAtom);
 
@@ -377,7 +296,7 @@ public class DashedBondManager : MonoBehaviour
             GenerateDashedBondsFor(atom, bondType, data.element.maxBondCount);
         }
 
-        // 自动转换：检查新虚键末端是否有原子
+        // 检查新虚键末端是否有原子
         CheckAndConvertDashedBondsToPreserved();
     }
 
@@ -413,11 +332,7 @@ public class DashedBondManager : MonoBehaviour
         CheckAndConvertDashedBondsToPreserved();
     }
 
-    /// <summary>
-    /// 只生成虚键，不触发自动转换为实键。
-    /// 供 RefreshDashedBondsForAffectedAtoms 调用，
-    /// 避免 UpdateDashBonds → CheckAndConvert → Refresh → UpdateDashBonds 无限递归。
-    /// </summary>
+    // 只生成虚键，不触发自动转换为实键。
     private void UpdateDashedBondsInternal(GameObject selectedAtom, int selectedBondType, int maxBondCount)
     {
         ClearDashedBonds();
@@ -425,19 +340,14 @@ public class DashedBondManager : MonoBehaviour
         GenerateDashedBondsFor(selectedAtom, selectedBondType, maxBondCount);
     }
 
-    /// <summary>
-    /// 只为指定原子生成虚键，不清除全局虚键。
-    /// 调用方应先自行调用 ClearDashedBondsForAtom。
-    /// </summary>
+    // 只为指定原子生成虚键，不清除全局虚键。
     private void UpdateDashedBondsLocal(GameObject atom, int bondType, int maxBondCount)
     {
         if (atom == null) return;
         GenerateDashedBondsFor(atom, bondType, maxBondCount);
     }
 
-    /// <summary>
-    /// 为指定原子生成虚键，排除已有实键占用的方向
-    /// </summary>
+    // 为指定原子生成虚键，排除已有实键占用的方向
     private void GenerateDashedBondsFor(GameObject selectedAtom, int selectedBondType, int maxBondCount)
     {
         currentDashedBondAtom = selectedAtom;
@@ -448,8 +358,8 @@ public class DashedBondManager : MonoBehaviour
         int usedBonds = (atomData != null) ? atomData.usedBonds : 0;
         int remainingSlots = maxBondCount - usedBonds;
 
-        Debug.Log($"[UpdateDashedBonds] 原子:{selectedAtom.name}, 键类型(selectedBondType):{selectedBondType}, " +
-                  $"maxBondCount:{maxBondCount}, usedBonds:{usedBonds}, remainingSlots:{remainingSlots}");
+        //Debug.Log($"[UpdateDashedBonds] 原子:{selectedAtom.name}, 键类型(selectedBondType):{selectedBondType}, " +
+        //          $"maxBondCount:{maxBondCount}, usedBonds:{usedBonds}, remainingSlots:{remainingSlots}");
 
         if (remainingSlots <= 0) return;
 
@@ -460,8 +370,8 @@ public class DashedBondManager : MonoBehaviour
         List<Vector3> occupiedDirections = GetOccupiedDirections(selectedAtom);
         int occupiedCount = occupiedDirections.Count;
 
-        Debug.Log($"[GenerateDashedBondsFor] {selectedAtom.name} bondAngle:{bondAngle}°, " +
-                  $"已占用方向数:{occupiedCount}, 需要生成:{remainingSlots}");
+        //Debug.Log($"[GenerateDashedBondsFor] {selectedAtom.name} bondAngle:{bondAngle}°, " +
+        //          $"已占用方向数:{occupiedCount}, 需要生成:{remainingSlots}");
 
         switch (maxBondCount)
         {
@@ -480,10 +390,7 @@ public class DashedBondManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 获取指定原子已有实键占用的方向列表（从原子出发的单位向量）
-    /// 优化：使用 atomToPreservedBonds 索引，避免遍历全部键
-    /// </summary>
+    // 获取指定原子已有实键占用的方向列表
     private List<Vector3> GetOccupiedDirections(GameObject atom)
     {
         List<Vector3> dirs = new List<Vector3>();
@@ -491,7 +398,6 @@ public class DashedBondManager : MonoBehaviour
 
         Vector3 atomPos = atom.transform.position;
 
-        // 使用索引字典快速查找与当前原子相连的键
         if (!atomToPreservedBonds.ContainsKey(atom))
             return dirs;
 
@@ -539,13 +445,7 @@ public class DashedBondManager : MonoBehaviour
         return result;
     }
 
-    /// <summary>
-    /// 检查虚键末端是否有原子，如果有则自动转换为实键
-    /// </summary>
-    /// <param name="shouldRefreshGlow">
-    /// 是否同步刷新受影响原子的光晕状态。
-    /// 创建原子时应传 true；仅刷新虚键显示（如选中原子时）应传 false。
-    /// </param>
+    // 检查虚键末端是否有原子，如果有则自动转换为实键
     public void CheckAndConvertDashedBondsToPreserved(bool shouldRefreshGlow = false)
     {
         // 先收集需要转换的虚键信息，避免遍历时修改集合
@@ -584,7 +484,6 @@ public class DashedBondManager : MonoBehaviour
 
     private GameObject FindAtomAtPosition(Vector3 position)
     {
-        // 预分配数组，避免 TLS 堆栈内存泄漏
         int count = Physics.OverlapSphereNonAlloc(position, PositionCheckRadius, overlapSphereBuffer);
         for (int i = 0; i < count; i++)
         {
@@ -622,21 +521,21 @@ public class DashedBondManager : MonoBehaviour
         activeBonds.Remove(dashedBond);
         dashedBond.SetActive(false);
 
-        // 通过 Command 系统记录历史，支持撤销/重做
+        // 通过 Command 系统记录历史
         if (historyManager != null)
         {
             var command = new CreateBondCommand(this, startAtom, endAtom, bondType);
             historyManager.ExecuteCommand(command);
-            Debug.Log($"自动转换虚键为实键（已记录历史）: {startAtom.name} - {endAtom.name}, 键类型: {bondType}");
+            //Debug.Log($"自动转换虚键为实键（已记录历史）: {startAtom.name} - {endAtom.name}, 键类型: {bondType}");
         }
         else
         {
-            // 兜底：直接创建（无历史记录）
+            // 直接创建
             GameObject preservedBond = CreateAutoPreservedBond(startAtom, endAtom, bondType);
             if (preservedBond != null)
             {
                 UpdateAtomBondCount(startAtom, endAtom, bondType);
-                Debug.Log($"自动转换虚键为实键: {startAtom.name} - {endAtom.name}, 键类型: {bondType}");
+                //Debug.Log($"自动转换虚键为实键: {startAtom.name} - {endAtom.name}, 键类型: {bondType}");
             }
         }
     }
@@ -658,7 +557,7 @@ public class DashedBondManager : MonoBehaviour
         Vector3 start = startAtom.transform.position;
         Vector3 end = endAtom.transform.position;
 
-        // 防止重复创建：检查这对原子之间是否已存在实键（距离阈值比较，避免浮点精度问题）
+        // 防止重复创建：检查这对原子之间是否已存在实键
         foreach (var existingBond in preservedBonds)
         {
             if (existingBond == null) continue;
@@ -671,12 +570,12 @@ public class DashedBondManager : MonoBehaviour
                              Vector3.Distance(existLink.endPosition, start) < 0.5f);
             if (samePair)
             {
-                Debug.Log($"[CreateAutoPreservedBond] 跳过重复键: {startAtom.name}-{endAtom.name} (已存在)");
+                Debug.LogWarning($"[CreateAutoPreservedBond] 跳过重复键: {startAtom.name}-{endAtom.name} (已存在)");
                 return null;
             }
         }
 
-        // 从对象池中查找匹配的隐藏虚键（排除已占用为 PreservedBond 的对象）
+        // 从对象池中查找匹配的隐藏虚键
         GameObject bond = null;
         foreach (var b in dashedBondsPool)
         {
@@ -701,7 +600,7 @@ public class DashedBondManager : MonoBehaviour
         }
         else
         {
-            // 复用时完全重置旧数据，防止残留
+            // 复用时完全重置旧数据
             DashedBondLink oldLink = bond.GetComponent<DashedBondLink>();
             if (oldLink != null)
             {
@@ -711,7 +610,7 @@ public class DashedBondManager : MonoBehaviour
             }
         }
 
-        // 彻底重置对象状态（防止对象池复用残留状态）
+        // 彻底重置对象状态
         bond.transform.SetParent(null);
         bond.layer = 0;
         bond.tag = "PreservedBond";
@@ -745,13 +644,13 @@ public class DashedBondManager : MonoBehaviour
         }
 
         string parentName = bond.transform.parent != null ? bond.transform.parent.gameObject.name : "null";
-        Debug.Log("[CreateAutoPreservedBond] 创建完成: " + startAtom.name + "-" + endAtom.name + ", 类型:" + bondType +
-                  ", 位置:" + bond.transform.position +
-                  ", 旋转:" + bond.transform.rotation.eulerAngles +
-                  ", 缩放:" + bond.transform.localScale +
-                  ", 激活:" + bond.activeInHierarchy + ", 层级:" + bond.layer + ", 父对象:" + parentName +
-                  ", RendererEnabled:" + (renderer?.enabled) + ", 材质:" + (renderer?.material?.name) +
-                  ", InstanceID:" + bond.GetInstanceID() + ", 池中总数:" + dashedBondsPool.Count);
+        //Debug.Log("[CreateAutoPreservedBond] 创建完成: " + startAtom.name + "-" + endAtom.name + ", 类型:" + bondType +
+        //          ", 位置:" + bond.transform.position +
+        //          ", 旋转:" + bond.transform.rotation.eulerAngles +
+        //          ", 缩放:" + bond.transform.localScale +
+        //          ", 激活:" + bond.activeInHierarchy + ", 层级:" + bond.layer + ", 父对象:" + parentName +
+        //          ", RendererEnabled:" + (renderer?.enabled) + ", 材质:" + (renderer?.material?.name) +
+        //          ", InstanceID:" + bond.GetInstanceID() + ", 池中总数:" + dashedBondsPool.Count);
 
         DashedBondLink link = bond.GetComponent<DashedBondLink>();
         link.linkedAtom = startAtom;
@@ -772,9 +671,7 @@ public class DashedBondManager : MonoBehaviour
         return bond;
     }
 
-    /// <summary>
-    /// 去重：如果同一原子对之间已存在实键，删除旧的，保留新建的
-    /// </summary>
+    // 如果同一原子对之间已存在实键，删除旧的，保留新建的
     private void RemoveDuplicatePreservedBond(GameObject newBond, GameObject startAtom, GameObject endAtom)
     {
         Vector3 newStart = startAtom.transform.position;
@@ -807,7 +704,6 @@ public class DashedBondManager : MonoBehaviour
                     reversePB.reverseBond = null;
             }
 
-            // 维护原子→键索引字典
             RemoveBondFromAtomIndex(existing);
 
             preservedBonds.RemoveAt(i);
@@ -815,9 +711,7 @@ public class DashedBondManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 全局去重：遍历所有实键，每对原子只保留一根
-    /// </summary>
+    /// 遍历所有实键，每对原子只保留一根
     public void RemoveAllDuplicatePreservedBonds()
     {
         HashSet<string> seenPairs = new HashSet<string>();
@@ -834,7 +728,7 @@ public class DashedBondManager : MonoBehaviour
             int id1 = link.linkedAtom != null ? link.linkedAtom.GetInstanceID() : -1;
             int id2 = pb.OtherLinkedAtom != null ? pb.OtherLinkedAtom.GetInstanceID() : -1;
 
-            // 较小 ID 排前，保证 A→B 和 B→A 生成相同的 key
+            // 保证 A→B 和 B→A 生成相同的 key
             int minId = Mathf.Min(id1, id2);
             int maxId = Mathf.Max(id1, id2);
             string pairKey = $"{minId}_{maxId}";
@@ -861,9 +755,7 @@ public class DashedBondManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 基于位置的去重（用于 PreserveBondManually 路径，没有 OtherLinkedAtom 时）
-    /// </summary>
+    // 基于位置的去重
     private void RemoveDuplicateByPosition(GameObject linkedAtom, Vector3 endPosition)
     {
         for (int i = preservedBonds.Count - 1; i >= 0; i--)
@@ -895,9 +787,7 @@ public class DashedBondManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 撤销删除原子时的局部刷新：只为恢复的原子生成虚键并检查自动转换，不清除全局虚键
-    /// </summary>
+    // 撤销删除原子时的局部刷新：只为恢复的原子生成虚键并检查自动转换，不清除全局虚键
     public void RefreshForRestoredAtom(GameObject restoredAtom, int usedBonds, int maxBondCount)
     {
         if (restoredAtom == null) return;
@@ -944,24 +834,17 @@ public class DashedBondManager : MonoBehaviour
         RefreshGlowForAffectedAtoms(bondsToConvert);
     }
 
-    /// <summary>
-    /// 更新两个原子的 usedBonds（仅数据，不刷新虚键显示，由调用方统一刷新）
-    /// </summary>
+    // 更新两个原子的 usedBonds，不刷新虚键显示
     private void UpdateAtomBondCount(GameObject atom1, GameObject atom2, int bondType)
     {
         AtomData data1 = atom1.GetComponent<AtomData>();
         AtomData data2 = atom2.GetComponent<AtomData>();
 
-        // 批量转换过程中不调用 UpdateDashedBonds，避免边遍历 activeBonds 边修改集合
         if (data1 != null) data1.usedBonds += bondType;
         if (data2 != null) data2.usedBonds += bondType;
     }
 
-    /// <summary>
-    /// 批量转换完成后，统一刷新受影响原子的虚键显示。
-    /// 此处调用 UpdateDashedBondsLocal 而非 UpdateDashedBonds，
-    /// 避免再次触发 CheckAndConvert → RefreshDashedBonds 的无限递归。
-    /// </summary>
+    // 批量转换完成后，统一刷新受影响原子的虚键显示。
     private void RefreshDashedBondsForAffectedAtoms(List<(GameObject dashedBond, GameObject endAtom)> bondsToConvert)
     {
         var affectedAtoms = new HashSet<GameObject>();
@@ -989,10 +872,7 @@ public class DashedBondManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 创建/恢复原子并自动成键后，立即刷新受影响原子的光晕状态。
-    /// 例如 CH₄：创建最后一个 H 时，C 的 usedBonds 达到 maxBondCount，应立即取消光晕。
-    /// </summary>
+    // 创建/恢复原子并自动成键后，立即刷新受影响原子的光晕状态。
     private void RefreshGlowForAffectedAtoms(List<(GameObject dashedBond, GameObject endAtom)> bondsToConvert)
     {
         if (atomManager == null) return;
@@ -1013,11 +893,7 @@ public class DashedBondManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 为 maxBondCount=4 的原子（C、Si）生成虚键，正确计算键型和键角。
-    /// 逻辑：优先放 1 个选中类型的键，剩余键位用单键补足；
-    /// 根据总取代基数量（已有 + 新增）动态计算键角。
-    /// </summary>
+    // 为 maxBondCount=4 的原子生成虚键
     private void HandleMaxBond4Excluding(Vector3 position, int bondType, int remainingSlots,
         List<Vector3> occupiedDirections, float bondAngle)
     {
@@ -1045,7 +921,7 @@ public class DashedBondManager : MonoBehaviour
         if (totalSubstituents >= 4)
             effectiveAngle = 109.5f;       // sp³ 四面体
         else if (totalSubstituents == 3)
-            effectiveAngle = 120f;         // sp² 三角平面
+            effectiveAngle = 120f;         // sp² 平面三角形
         else
             effectiveAngle = 180f;         // sp  直线
 
@@ -1067,7 +943,7 @@ public class DashedBondManager : MonoBehaviour
                 dirs = RotateDirectionsToAlign(dirs, occupiedDirections);
         }
 
-        // 过滤掉已被占用方向，最多返回 newBondsCount 个
+        // 过滤掉已被占用方向
         var availableDirs = FilterUnoccupiedDirections(dirs, occupiedDirections, newBondsCount);
 
         // 为每个方向分配正确的键型：第一个用选中类型，其余用单键
@@ -1093,11 +969,7 @@ public class DashedBondManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 为 maxBondCount=3 的原子（N、P、Al）生成虚键，正确计算键型和键角。
-    /// N/Al 有 1 个孤对电子，3 个取代基时呈三角锥形（~107°），
-    /// 2 个取代基时呈 V 型（~107°）。
-    /// </summary>
+    /// 为 maxBondCount=3 的原子生成虚键
     private void HandleMaxBond3Excluding(Vector3 position, int bondType, int remainingSlots,
         List<Vector3> occupiedDirections, float bondAngle)
     {
@@ -1123,15 +995,13 @@ public class DashedBondManager : MonoBehaviour
         if (totalSubstituents >= 3 || occupiedCount >= 3)
         {
             // 3 个取代基：三角锥形（sp³ + 孤对电子）
-            // 用四面体方向，取其中 3 个（排除孤对电子方向）
             Vector3[] tetra = GetTetrahedralDirections(bondAngle);
-            // 默认排除 d0（Y 轴方向），代表孤对电子的常见位置
-            // 旋转对齐后再决定哪个方向是"孤对电子"
+
             dirs = new Vector3[] { tetra[1], tetra[2], tetra[3] };
         }
         else if (totalSubstituents == 2 || occupiedCount >= 2)
         {
-            // 2 个取代基：V 型（有孤对电子）或直线型（无孤对电子）
+            // 2 个取代基：V 型或直线型
             if (bondAngle < 179f)
                 dirs = GetBentDirections(bondAngle);
             else
@@ -1178,9 +1048,7 @@ public class DashedBondManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 为 maxBondCount=2 的原子（O、S、Mg、Ca）生成虚键，正确计算键型和键角。
-    /// </summary>
+    // 为 maxBondCount=2 的原子生成虚键
     private void HandleMaxBond2Excluding(Vector3 position, int bondType, int remainingSlots,
         List<Vector3> occupiedDirections, float bondAngle)
     {
@@ -1237,9 +1105,7 @@ public class DashedBondManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 生成四面体 4 方向（sp³ 类），以 Y 轴为第一方向，其余三个均匀分布在底面圆锥上
-    /// </summary>
+    /// 生成四面体 4 方向，以 Y 轴为第一方向，其余三个均匀分布在底面圆锥上
     private Vector3[] GetTetrahedralDirections(float bondAngleDeg)
     {
         float theta = bondAngleDeg * Mathf.Deg2Rad;
@@ -1256,9 +1122,7 @@ public class DashedBondManager : MonoBehaviour
         return new Vector3[] { d0, d1, d2, d3 };
     }
 
-    /// <summary>
-    /// 生成 N 个平面内均匀分布的方向（sp² 类）
-    /// </summary>
+    /// 生成 N 个平面内均匀分布的方向
     private Vector3[] GetPlanarDirections(float bondAngleDeg, int count)
     {
         Vector3[] dirs = new Vector3[count];
@@ -1270,9 +1134,7 @@ public class DashedBondManager : MonoBehaviour
         return dirs;
     }
 
-    /// <summary>
-    /// 生成 V 形 2 方向（O/S 类，键角 &lt; 180°），两方向关于 Y 轴对称
-    /// </summary>
+    // 生成 V 形 2 方向，两方向关于 Y 轴对称
     private Vector3[] GetBentDirections(float bondAngleDeg)
     {
         float half = bondAngleDeg / 2f * Mathf.Deg2Rad;
@@ -1281,9 +1143,7 @@ public class DashedBondManager : MonoBehaviour
         return new Vector3[] { d0, d1 };
     }
 
-    /// <summary>
     /// 旋转四面体方向组，使其尽量对齐已占用方向
-    /// </summary>
     private Vector3[] RotateTetrahedralToAlign(Vector3[] tetraDirs, List<Vector3> occupiedDirections)
     {
         Vector3 target = occupiedDirections[0].normalized;
@@ -1323,9 +1183,7 @@ public class DashedBondManager : MonoBehaviour
         return result;
     }
 
-    /// <summary>
-    /// 通用方向旋转对齐：旋转方向组使其整体最接近已占用方向
-    /// </summary>
+    // 通用方向旋转对齐：旋转方向组使其整体最接近已占用方向
     private Vector3[] RotateDirectionsToAlign(Vector3[] baseDirs, List<Vector3> occupiedDirections)
     {
         Vector3 target = occupiedDirections[0].normalized;
@@ -1518,7 +1376,7 @@ public class DashedBondManager : MonoBehaviour
 
         if (IsPositionBlocked(end)) return;
 
-        // 从对象池中查找可复用的虚键（排除已转换为 PreservedBond 的对象，防止复用实键）
+        // 从对象池中查找可复用的虚键
         GameObject cylinder = null;
         foreach (var b in dashedBondsPool)
         {
@@ -1550,10 +1408,9 @@ public class DashedBondManager : MonoBehaviour
             bondLink = cylinder.GetComponent<DashedBondLink>();
         }
 
-        // 使用 currentDashedBondAtom 而非 lastSelectedAtom，确保 linkedAtom 和父对象始终正确
         GameObject linkedAtom = currentDashedBondAtom;
 
-        // 无论新建还是复用，统一重置数据（防止复用时残留旧 bondType/endPosition/linkedAtom）
+        // 重置数据
         bondLink.linkedAtom = linkedAtom;
         bondLink.endPosition = end;
         bondLink.bondType = bondType;
@@ -1575,7 +1432,7 @@ public class DashedBondManager : MonoBehaviour
         activeBonds.Add(cylinder);
         dashedBonds.Add(cylinder);
 
-        Debug.Log($"[CreateDashedLine] 虚键生成: linkedAtom={linkedAtom?.name}, 末端={end:F2}, bondType={bondType}, 激活={cylinder.activeInHierarchy}");
+        //Debug.Log($"[CreateDashedLine] 虚键生成: linkedAtom={linkedAtom?.name}, 末端={end:F2}, bondType={bondType}, 激活={cylinder.activeInHierarchy}");
     }
 
     public bool IsPositionBlocked(Vector3 targetPosition)
@@ -1647,7 +1504,6 @@ public class DashedBondManager : MonoBehaviour
 
     public bool HasPreservedBondForAtom(GameObject atom)
     {
-        // 用 foreach 替代 LINQ Any，避免枚举器分配
         foreach (var bond in preservedBonds)
         {
             if (bond == null) continue;
@@ -1660,8 +1516,8 @@ public class DashedBondManager : MonoBehaviour
 
     public void DeletePreservedBond(GameObject bond)
     {
-        Debug.Log($"[DeletePreservedBond] 被调用! InstanceID:{bond?.GetInstanceID()}, " +
-                  $"名称:{bond?.name}, 活跃:{bond?.activeSelf}, 在preservedBonds中:{preservedBonds.Contains(bond)}");
+        //Debug.Log($"[DeletePreservedBond] 被调用! InstanceID:{bond?.GetInstanceID()}, " +
+        //          $"名称:{bond?.name}, 活跃:{bond?.activeSelf}, 在preservedBonds中:{preservedBonds.Contains(bond)}");
         if (preservedBonds.Contains(bond))
         {
             // 更新相邻原子的 usedBonds
@@ -1699,12 +1555,11 @@ public class DashedBondManager : MonoBehaviour
                     reversePB.reverseBond = null;
             }
 
-            // 维护原子→键索引字典
             RemoveBondFromAtomIndex(bond);
 
             preservedBonds.Remove(bond);
             Destroy(bond);
-            Debug.Log($"[DeletePreservedBond] 已从列表移除并Destroy, InstanceID:{bond.GetInstanceID()}");
+            //Debug.Log($"[DeletePreservedBond] 已从列表移除并Destroy, InstanceID:{bond.GetInstanceID()}");
         }
         else
         {
@@ -1741,12 +1596,10 @@ public class DashedBondManager : MonoBehaviour
         preservedBonds.Clear();
     }
 
-    /// <summary>
-    /// 立即销毁所有键并清空内部列表（用于场景加载前清空，避免 Destroy 延迟导致重叠检测失败）
-    /// </summary>
+    // 立即销毁所有键并清空内部列表
     public void ClearAllBondsImmediate()
     {
-        // 立即销毁所有虚键（dashedBondsPool 中的对象）
+        // 立即销毁所有虚键
         foreach (var bond in dashedBondsPool)
         {
             if (bond != null)
@@ -1767,10 +1620,7 @@ public class DashedBondManager : MonoBehaviour
         atomToPreservedBonds.Clear();
     }
 
-    /// <summary>
-    /// 重建 atomToPreservedBonds 索引字典（场景加载后调用）
-    /// 遍历 preservedBonds，为每个键建立原子→相连实键的索引
-    /// </summary>
+    // 重建atomToPreservedBonds索引字典
     public void RebuildAtomToPreservedBondsIndex()
     {
         atomToPreservedBonds.Clear();
@@ -1781,7 +1631,7 @@ public class DashedBondManager : MonoBehaviour
             AddBondToAtomIndex(bond);
         }
 
-        Debug.Log($"[DashedBondManager] 重建索引完成，共 {atomToPreservedBonds.Count} 个原子有相连实键");
+        //Debug.Log($"[DashedBondManager] 重建索引完成，共 {atomToPreservedBonds.Count} 个原子有相连实键");
     }
 
     public void ClearDashedBondsForAtom(GameObject atom)
@@ -1790,10 +1640,10 @@ public class DashedBondManager : MonoBehaviour
             b != null &&
             b.GetComponent<DashedBondLink>()?.linkedAtom == atom))
         {
-            // 安全检查：跳过已被转换为 PreservedBond 的对象
+            // 跳过已被转换为 PreservedBond 的对象
             if (bond.CompareTag("PreservedBond"))
             {
-                //Debug.LogWarning($"[ClearDashedBondsForAtom] 跳过 PreservedBond: {bond.name} (InstanceID:{bond.GetInstanceID()}), 该对象不应在 dashedBonds 中！");
+                Debug.LogWarning($"[ClearDashedBondsForAtom] 跳过 PreservedBond: {bond.name} (InstanceID:{bond.GetInstanceID()}), 该对象不应在 dashedBonds 中！");
                 continue;
             }
             bond.SetActive(false);
@@ -1821,7 +1671,7 @@ public class DashedBondManager : MonoBehaviour
         {
             if (bond != null)
             {
-                // 安全检查：跳过已转换为 PreservedBond 的对象
+                // 跳过已转换为 PreservedBond 的对象
                 if (bond.CompareTag("PreservedBond"))
                 {
                     Debug.LogWarning($"[ClearDashedBonds] 跳过 PreservedBond: {bond.name} (InstanceID:{bond.GetInstanceID()}), 该对象不应在 activeBonds 中！");
@@ -1835,9 +1685,7 @@ public class DashedBondManager : MonoBehaviour
         selectedDashedBond = null;
     }
 
-    /// <summary>
-    /// 清除虚键并重置缓存，确保下次重新选中时能正确刷新
-    /// </summary>
+    // 清除虚键并重置缓存
     public void ClearDashedBondsAndResetCache()
     {
         ClearDashedBonds();
@@ -1851,10 +1699,8 @@ public class DashedBondManager : MonoBehaviour
         preservedBonds.Clear();
     }
 
-    /// <summary>
-    /// 删除与原子关联的所有实键，同时减少关联原子的 usedBonds
-    /// 如果原子被删除，相连的实键会变成虚键（而不是被完全删除）
-    /// </summary>
+    // 删除与原子关联的所有实键，同时减少关联原子的 usedBonds
+    // 如果原子被删除，相连的实键会变成虚键
     public List<GameObject> DeletePreservedBondsForAtom(GameObject atom)
     {
         List<GameObject> affectedNeighbors = new List<GameObject>();
@@ -1889,9 +1735,7 @@ public class DashedBondManager : MonoBehaviour
         return affectedNeighbors;
     }
 
-    /// <summary>
-    /// 将实键转换回虚键
-    /// </summary>
+    // 将实键转换回虚键
     private void ConvertToDashedBond(GameObject bond, GameObject remainingAtom, Vector3 endPosition)
     {
         if (bond == null) return;

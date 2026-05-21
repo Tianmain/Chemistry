@@ -9,7 +9,7 @@ public class BondRotator : MonoBehaviour
 {
     // 当前旋转的键
     private GameObject _selectedBond;
-    private Vector3 _bondAxis;        // 键的轴向
+    private Vector3 _bondAxis;          // 键的轴向
     private GameObject _rotateAtom;     // 旋转端的根原子
     private GameObject _fixedAtom;      // 固定端的根原子
     private List<GameObject> _rotateAtoms = new List<GameObject>();
@@ -23,14 +23,13 @@ public class BondRotator : MonoBehaviour
     private Vector3 _dragStartPos;
     private float _dragStartAngle;
 
-    // 引用
     private DashedBondManager _bondManager;
     private AtomManager _atomManager;
 
     private const float ROTATION_SPEED = 0.3f;
     private const float SNAP_ANGLE = 15f;  // Shift 键吸附角度
 
-    // 旋转停止时触发的事件（用于取消选中）
+    // 旋转停止时触发的事件
     public System.Action onStopRotation;
 
     void Awake()
@@ -47,9 +46,7 @@ public class BondRotator : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 开始旋转指定的键，返回 true 表示成功启动
-    /// </summary>
+    // 开始旋转指定的键
     public bool StartRotation(GameObject bond)
     {
         if (bond == null)
@@ -73,11 +70,11 @@ public class BondRotator : MonoBehaviour
             return false;
         }
 
-        // 计算两端的原子堆大小（以键为界，只取一侧）
+        // 计算两端的原子堆大小
         HashSet<GameObject> pile1 = _bondManager.GetConnectedAtomsExcluding(atom1, atom2);
         HashSet<GameObject> pile2 = _bondManager.GetConnectedAtomsExcluding(atom2, atom1);
 
-        Debug.Log($"[BondRotator] 键旋转: {atom1.name} 端 {pile1.Count} 个原子, {atom2.name} 端 {pile2.Count} 个原子");
+        //Debug.Log($"[BondRotator] 键旋转: {atom1.name} 端 {pile1.Count} 个原子, {atom2.name} 端 {pile2.Count} 个原子");
 
         // 选择原子数较少的那一端作为旋转端
         if (pile1.Count <= pile2.Count)
@@ -95,7 +92,7 @@ public class BondRotator : MonoBehaviour
             _rotateBonds = GetBondsInPile(pile2, atom2);
         }
 
-        // 排除旋转端的根原子（它作为旋转中心，不需要移动）
+        // 排除旋转端的根原子
         _rotateAtoms.Remove(_rotateAtom);
 
         _selectedBond = bond;
@@ -105,13 +102,11 @@ public class BondRotator : MonoBehaviour
         _currentAngle = 0f;
         _isDragging = false;
 
-        Debug.Log($"[BondRotator] 旋转端: {_rotateAtom.name}, 固定端: {_fixedAtom.name}, 需旋转 {_rotateAtoms.Count} 个原子。按住左键拖拽旋转，ESC停止。");
+        //Debug.Log($"[BondRotator] 旋转端: {_rotateAtom.name}, 固定端: {_fixedAtom.name}, 需旋转 {_rotateAtoms.Count} 个原子。按住左键拖拽旋转，ESC停止。");
         return true;
     }
 
-    /// <summary>
-    /// 停止旋转，并触发事件通知外部（如取消选中）
-    /// </summary>
+    // 停止旋转
     public void StopRotation()
     {
         _isRotating = false;
@@ -119,15 +114,13 @@ public class BondRotator : MonoBehaviour
         _selectedBond = null;
         _rotateAtoms.Clear();
         _rotateBonds.Clear();
-        Debug.Log("[BondRotator] 旋转已停止");
+        //Debug.Log("[BondRotator] 旋转已停止");
 
-        // 触发停止事件（InputHandler 会订阅此事件来取消选中）
+        // 触发停止事件
         onStopRotation?.Invoke();
     }
 
-    /// <summary>
-    /// 获取原子堆中所有相关的键
-    /// </summary>
+    // 获取原子堆中所有相关的键
     private List<GameObject> GetBondsInPile(HashSet<GameObject> pile, GameObject rootAtom)
     {
         List<GameObject> bonds = new List<GameObject>();
@@ -160,11 +153,7 @@ public class BondRotator : MonoBehaviour
         _bondAxis = (pos2 - pos1).normalized;
     }
 
-    /// <summary>
-    /// 处理旋转输入：按住左键拖拽旋转
-    /// 按住 Shift 键时，角度吸附到 15° 倍数
-    /// 由 InputHandler.Update() 在旋转模式下调用
-    /// </summary>
+    // 处理旋转输入
     public void HandleRotationInput()
     {
         // 按住左键开始拖拽
@@ -187,7 +176,7 @@ public class BondRotator : MonoBehaviour
             if (shiftHeld)
             {
                 float snapped = Mathf.Round(targetAngle / SNAP_ANGLE) * SNAP_ANGLE;
-                // 只在角度实际变化时才应用，避免抖动
+
                 if (Mathf.Abs(snapped - _currentAngle) > 0.01f)
                 {
                     float applyDelta = snapped - _currentAngle;
@@ -217,9 +206,7 @@ public class BondRotator : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 应用旋转角度到原子堆
-    /// </summary>
+    // 应用旋转角度到原子堆
     private void ApplyRotation(float angleDelta)
     {
         if (_rotateAtom == null) return;
@@ -242,9 +229,7 @@ public class BondRotator : MonoBehaviour
         UpdateBondAxis();
     }
 
-    /// <summary>
-    /// 更新键的 Transform（位置、旋转、缩放）
-    /// </summary>
+    // 更新键的 Transform
     private void UpdateBondTransform(GameObject bond)
     {
         DashedBondLink link = bond.GetComponent<DashedBondLink>();
