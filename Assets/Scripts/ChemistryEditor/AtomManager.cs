@@ -18,7 +18,7 @@ public class AtomManager : MonoBehaviour
     private Dictionary<GameObject, GameObject> atomToParentMap = new Dictionary<GameObject, GameObject>();
     private Dictionary<GameObject, GameObject> atomToGlowMap = new Dictionary<GameObject, GameObject>();
 
-    // 预分配碰撞检测数组，避免 Physics.OverlapSphere 导致 TLS 堆栈内存泄漏
+    // 预分配碰撞检测数组
     private Collider[] overlapSphereBuffer = new Collider[16];
 
     private void Awake()
@@ -26,7 +26,7 @@ public class AtomManager : MonoBehaviour
         if (materialManager == null)
             materialManager = FindObjectOfType<MaterialManager>();
         if (materialManager == null)
-            Debug.LogError("[AtomManager] MaterialManager 未找到，请在 Inspector 中手动绑定！");
+            Debug.LogError("[AtomManager] MaterialManager 未找到");
     }
 
     public bool CheckAtomOverlap(Vector3 position)
@@ -88,14 +88,6 @@ public class AtomManager : MonoBehaviour
 
         atoms.Add(atom);
         Debug.Log($"原子 {element.name} 创建成功，ID: {atom.GetInstanceID()}");
-
-        if (dashedBondManager != null)
-        {
-            // 注意：不要在 CreateAtom 中自动转换虚键为实键
-            // 因为 CreateAtom 可能被 CreateAtomCommand 调用，
-            // 而键的创建应该由 Command 统一记录到历史
-            // 虚键转实键的逻辑改由 InputHandler 在创建原子后显式调用
-        }
 
         return atom;
     }

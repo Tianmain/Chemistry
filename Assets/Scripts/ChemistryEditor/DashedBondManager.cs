@@ -151,6 +151,16 @@ public class DashedBondManager : MonoBehaviour
     }
 
     /// <summary>
+    /// 获取与指定原子相连的所有原子（返回 HashSet，供 BondRotator 使用）
+    /// </summary>
+    public HashSet<GameObject> GetConnectedAtomsHashSet(GameObject startAtom)
+    {
+        var list = GetConnectedAtoms(startAtom);
+        var set = new HashSet<GameObject>(list);
+        return set;
+    }
+
+    /// <summary>
     /// 更新所有与指定原子相连的实键的 Transform。
     /// 原子移动后调用此方法来更新键的显示位置。
     /// </summary>
