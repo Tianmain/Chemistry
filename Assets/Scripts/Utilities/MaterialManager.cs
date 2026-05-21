@@ -4,7 +4,6 @@ using System.Collections.Generic;
 [CreateAssetMenu(fileName = "MaterialManager", menuName = "Chemistry/Material Manager")]
 /// <summary>
 /// 材质管理器，为每种元素提供对应的 Material
-/// 在 Inspector 中配置，供 AtomManager 使用
 /// </summary>
 public class MaterialManager : ScriptableObject
 {
@@ -35,12 +34,8 @@ public class MaterialManager : ScriptableObject
     public Material dashedBondMaterial;
     public Material dashedBondHighlightMaterial;
 
-    /// <summary>
-    /// 在 Inspector 中赋值：所有 Element 资源（顺序不限）
-    /// </summary>
     public Element[] elements;
 
-    // 缓存字典，避免每次都 switch 或遍历
     private Dictionary<string, Material> elementMaterialMap;
     private Dictionary<string, Element> elementNameMap;
 
@@ -88,10 +83,7 @@ public class MaterialManager : ScriptableObject
         }
     }
 
-    /// <summary>
-    /// 按资源名查找 Element（用于存档加载）
-    /// 优化：使用字典查找，避免遍历
-    /// </summary>
+    // 按资源名查找Element
     public Element GetElement(string elementName)
     {
         if (string.IsNullOrEmpty(elementName)) return null;
@@ -105,10 +97,7 @@ public class MaterialManager : ScriptableObject
         return null;
     }
 
-    /// <summary>
-    /// 获取元素对应的材质
-    /// 优化：使用字典查找，避免 switch
-    /// </summary>
+    // 获取元素对应的材质
     public Material GetElementMaterial(string elementName)
     {
         if (string.IsNullOrEmpty(elementName)) return null;

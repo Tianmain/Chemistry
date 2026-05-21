@@ -5,7 +5,6 @@ public enum Language { English, Chinese }
 
 /// <summary>
 /// 本地化管理器，提供中英文文本查询
-/// 单例模式，在 Awake 中初始化
 /// </summary>
 public class LocalizationManager : MonoBehaviour
 {
@@ -15,7 +14,6 @@ public class LocalizationManager : MonoBehaviour
 
     private Language currentLanguage = Language.English;
 
-    // 缓存字典，避免每次遍历查找
     private Dictionary<string, string> englishMap;
     private Dictionary<string, string> chineseMap;
 

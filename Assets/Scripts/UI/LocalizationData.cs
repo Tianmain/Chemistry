@@ -1,6 +1,9 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+/// <summary>
+/// 本地化翻译
+/// </summary>
 [CreateAssetMenu(fileName = "LocalizationData", menuName = "Localization/Data")]
 public class LocalizationData : ScriptableObject
 {

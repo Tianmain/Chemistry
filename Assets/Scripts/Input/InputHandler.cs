@@ -80,11 +80,6 @@ public class InputHandler : MonoBehaviour
         ButtonVisiable();
         UpdateSelectedInfo();
 
-        if (Input.GetKeyDown(KeyCode.F12))
-        {
-            OutputDebugInfo();
-        }
-
         // 按 R 键启动键旋转
         if (Input.GetKeyDown(KeyCode.R))
         {
@@ -357,7 +352,7 @@ public class InputHandler : MonoBehaviour
         if (dashedBondManager.selectedDashedBond != null &&
             dashedBondManager.selectedDashedBond.CompareTag("PreservedBond"))
         {
-            // 使用 DeleteBondCommand 记录到历史，支持撤销/重做
+            // 使用DeleteBondCommand记录到历史
             var command = new DeleteBondCommand(dashedBondManager, dashedBondManager.selectedDashedBond);
             historyManager.ExecuteCommand(command);
             dashedBondManager.selectedDashedBond = null;
@@ -373,7 +368,7 @@ public class InputHandler : MonoBehaviour
             {
                 if (raycastHitCache.transform.CompareTag("PreservedBond"))
                 {
-                    // 使用 DeleteBondCommand 记录到历史，支持撤销/重做
+                    // 使用DeleteBondCommand记录到历史
                     var command = new DeleteBondCommand(dashedBondManager, raycastHitCache.transform.gameObject);
                     historyManager.ExecuteCommand(command);
 
@@ -404,12 +399,10 @@ public class InputHandler : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 处理原子拖拽：选中原子后按住左键拖动，所有相连原子一起移动
-    /// </summary>
+    // 处理原子拖拽
     private void HandleAtomDragging()
     {
-        // 开始拖拽：鼠标左键按下，且点击了选中的原子
+        // 开始拖拽
         if (!isDragging && Input.GetMouseButtonDown(0))
         {
             if (selectedAtom != null)
@@ -437,7 +430,7 @@ public class InputHandler : MonoBehaviour
             }
         }
 
-        // 拖拽中：鼠标左键按住
+        // 拖拽中
         if (isDragging && Input.GetMouseButton(0))
         {
             Vector3 currentMouseWorldPos = GetMouseWorldPosition();
@@ -447,7 +440,7 @@ public class InputHandler : MonoBehaviour
             // 移动选中的原子
             selectedAtom.transform.position = newSelectedAtomPos;
 
-            // 移动所有相连的原子（保持相对偏移）
+            // 移动所有相连的原子
             for (int i = 0; i < draggingConnectedAtoms.Count; i++)
             {
                 if (draggingConnectedAtoms[i] != null && draggingConnectedAtoms[i] != selectedAtom)
@@ -462,7 +455,7 @@ public class InputHandler : MonoBehaviour
             return;
         }
 
-        // 停止拖拽：鼠标左键释放
+        // 停止拖拽
         if (isDragging && Input.GetMouseButtonUp(0))
         {
             isDragging = false;
@@ -470,7 +463,7 @@ public class InputHandler : MonoBehaviour
             draggingOffsets = null;
         }
 
-        // 取消拖拽：按 ESC
+        // 取消拖拽
         if (isDragging && Input.GetKeyDown(KeyCode.Escape))
         {
             // 恢复初始位置
@@ -490,13 +483,11 @@ public class InputHandler : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 将鼠标屏幕坐标投影到与摄像机垂直的平面（通过原子位置）
-    /// </summary>
+    // 将鼠标屏幕坐标投影到与摄像机垂直的平面（通过原子位置）
     private Vector3 GetMouseWorldPosition()
     {
         Ray ray = cachedCamera.ScreenPointToRay(Input.mousePosition);
-        // 平面法线 = 摄像机 forward 方向，平面通过被拖拽的原子
+        // 平面法线是摄像机forward方向，平面通过被拖拽的原子
         Plane plane = new Plane(cachedCamera.transform.forward, dragStartAtomPos);
         if (plane.Raycast(ray, out float distance))
         {
@@ -541,15 +532,13 @@ public class InputHandler : MonoBehaviour
 
     private void UpdateSelectedInfo()
     {
-        // 脏标记检查：仅当选中状态变化时才重建字符串，避免每帧 new StringBuilder + string.Format 的临时分配
-        // 旋转时也需要更新角度显示
         bool isRotating = (bondRotator != null && bondRotator.IsRotating());
         if (!isSelectionDirty && !isRotating) return;
         isSelectionDirty = false;
 
         StringBuilder sb = new StringBuilder();
 
-        // 旋转时只显示旋转角度，不显示其他信息（包括键类型）
+        // 旋转时只显示旋转角度，不显示其他信息
         if (isRotating)
         {
             float angle = bondRotator.GetCurrentAngle();
@@ -559,7 +548,7 @@ public class InputHandler : MonoBehaviour
             return;
         }
 
-        // 非旋转时，显示选中信息（选中原子时不显示键类型）
+        // 非旋转时，显示选中信息
         if (selectedAtom != null)
         {
             Element element = GetElementFromAtom(selectedAtom);
@@ -616,7 +605,7 @@ public class InputHandler : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            // 单键始终允许（至少剩1个键位）
+            // 单键始终允许
             if (remainingSlots >= 1)
             {
                 selectedBondType = 1;
@@ -651,8 +640,6 @@ public class InputHandler : MonoBehaviour
 
     private void DashedBondsVisition()
     {
-        // 虚键生成由 HandleSelection和CheckAndConvertDashedBondsToPreserved负责，此处仅同步缓存
-        // 不在此处调用 UpdateDashedBonds，避免键类型切换时错误重建虚键
         cachedSelectedAtom = selectedAtom;
         cachedSelectedBondType = selectedBondType;
         cachedMaxBondCount = maxBondCount;
@@ -683,7 +670,7 @@ public class InputHandler : MonoBehaviour
         if (atomData != null && atomData.element != null)
             return atomData.element;
 
-        // 兜底：如果 AtomData 不存在，才使用名称匹配（兼容旧逻辑）
+        // 如果AtomData不存在，使用名称匹配
         Debug.LogWarning($"[InputHandler] 原子 {atom.name} 缺少 AtomData 组件，使用名称匹配");
         return atom.name switch
         {
@@ -706,24 +693,7 @@ public class InputHandler : MonoBehaviour
         };
     }
 
-    /// <summary>
-    /// F12：输出所有原子类型、坐标和键类型的调试信息
-    /// </summary>
-    public void OutputDebugInfo()
-    {
-        if (dashedBondManager == null)
-        {
-            Debug.LogWarning("DashedBondManager 未初始化，无法输出调试信息");
-            return;
-        }
-
-        string debugInfo = dashedBondManager.GetDebugInfo();
-        //Debug.Log("========== 原子与键调试信息 ==========\n" + debugInfo + "\n======================================");
-    }
-
-    /// <summary>
-    /// 尝试启动键旋转
-    /// </summary>
+    // 尝试启动键旋转
     private void TryStartBondRotation()
     {
         // 检查是否正在旋转中
@@ -741,7 +711,7 @@ public class InputHandler : MonoBehaviour
             return;
         }
 
-        // 如果 bondRotator 未赋值，尝试获取
+        // 如果bondRotator未赋值，尝试获取
         if (bondRotator == null)
         {
             bondRotator = GetComponent<BondRotator>();
@@ -764,9 +734,7 @@ public class InputHandler : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 键旋转停止时的回调：取消所有选中
-    /// </summary>
+    // 键旋转停止时，取消所有选中
     private void OnBondRotationStopped()
     {
         //Debug.Log("[BondRotator] 旋转停止，取消选中");
