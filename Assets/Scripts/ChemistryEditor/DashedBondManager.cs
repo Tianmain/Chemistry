@@ -1785,7 +1785,6 @@ public class DashedBondManager : MonoBehaviour
         // 更新位置
         UpdateDashedBondTransform(bond);
 
-        // 维护原子→键索引字典
         RemoveBondFromAtomIndex(bond);
 
         // 更新列表
@@ -1801,9 +1800,7 @@ public class DashedBondManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 更新虚键的 Transform，使其正确显示
-    /// </summary>
+    // 更新虚键的 Transform
     private void UpdateDashedBondTransform(GameObject dashedBond)
     {
         DashedBondLink link = dashedBond.GetComponent<DashedBondLink>();
@@ -1869,8 +1866,6 @@ public class DashedBondManager : MonoBehaviour
     {
         GameObject cylinder = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         cylinder.tag = "PreservedBond";
-
-        // 确保可见性：断开父对象、设置正确 layer、刷新激活状态
         cylinder.transform.SetParent(null);
         cylinder.layer = 0;
         cylinder.SetActive(false);
@@ -1922,7 +1917,6 @@ public class DashedBondManager : MonoBehaviour
 
     public bool HasAtomAtPosition(Vector3 position)
     {
-        // 预分配数组，避免 TLS 堆栈内存泄漏
         int count = Physics.OverlapSphereNonAlloc(position, PositionCheckRadius, overlapSphereBuffer);
         for (int i = 0; i < count; i++)
         {
@@ -1992,10 +1986,8 @@ public class DashedBondManager : MonoBehaviour
         return sb.ToString();
     }
 
-    /// <summary>
-    /// 程序化创建实键（供 Command 使用）
-    /// 创建前检查两个原子的键位是否都充足
-    /// </summary>
+    // 程序化创建实键
+    // 创建前检查两个原子的键位是否都充足
     public GameObject CreateBond(GameObject atom1, GameObject atom2, int bondType)
     {
         if (atom1 == null || atom2 == null) return null;
@@ -2007,7 +1999,7 @@ public class DashedBondManager : MonoBehaviour
             return null;
         }
 
-        // 去重：避免同一对原子重复创建
+        // 避免同一对原子重复创建
         GameObject existing = FindBondBetweenAtoms(atom1, atom2);
         if (existing != null)
         {
@@ -2022,7 +2014,7 @@ public class DashedBondManager : MonoBehaviour
             // 更新相连原子的 usedBonds 计数
             UpdateAtomBondCount(atom1, atom2, bondType);
 
-            // 创建实键后，立即检测并刷新相连原子的光晕状态
+            // 创建实键后，立即刷新相连原子的光晕状态
             if (atomManager != null)
             {
                 atomManager.UpdateAtomGlow(atom1);
@@ -2033,9 +2025,7 @@ public class DashedBondManager : MonoBehaviour
         return newBond;
     }
 
-    /// <summary>
-    /// 查找两个原子之间的实键
-    /// </summary>
+    // 查找两个原子之间的实键
     public GameObject FindBondBetweenAtoms(GameObject atom1, GameObject atom2)
     {
         if (atom1 == null || atom2 == null) return null;
@@ -2056,9 +2046,7 @@ public class DashedBondManager : MonoBehaviour
         return null;
     }
 
-    /// <summary>
-    /// 删除两个原子之间的实键（供 Command 使用）
-    /// </summary>
+    // 删除两个原子之间的实键
     public void DeleteBondBetweenAtoms(GameObject atom1, GameObject atom2)
     {
         GameObject bond = FindBondBetweenAtoms(atom1, atom2);
@@ -2079,9 +2067,7 @@ public class DashedBondManager : MonoBehaviour
         };
     }
 
-    /// <summary>
-    /// 获取当前活跃虚键的只读副本（供外部调试面板使用）
-    /// </summary>
+    // 获取当前活跃虚键的只读副本
     public List<GameObject> GetActiveBondList()
     {
         return activeBonds.Where(b => b != null && b.activeSelf).ToList();
