@@ -552,7 +552,7 @@ public class DashedBondManager : MonoBehaviour
         return remaining >= bondType;
     }
 
-    private GameObject CreateAutoPreservedBond(GameObject startAtom, GameObject endAtom, int bondType)
+    public GameObject CreateAutoPreservedBond(GameObject startAtom, GameObject endAtom, int bondType)
     {
         Vector3 start = startAtom.transform.position;
         Vector3 end = endAtom.transform.position;

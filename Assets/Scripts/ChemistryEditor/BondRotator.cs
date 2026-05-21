@@ -182,12 +182,14 @@ public class BondRotator : MonoBehaviour
                     float applyDelta = snapped - _currentAngle;
                     ApplyRotation(applyDelta);
                     _currentAngle = snapped;
+                    Debug.Log($"[BondRotator] 旋转角度（吸附）: {_currentAngle:F1}°");
                 }
             }
             else
             {
                 ApplyRotation(targetAngle - _currentAngle);
                 _currentAngle = targetAngle;
+                Debug.Log($"[BondRotator] 旋转角度: {_currentAngle:F1}°");
             }
         }
 

@@ -24,7 +24,7 @@ public class CreateAtomCommand : ICommand
         {
             createdAtom = atomManager.CreateAtom(position, element);
             wasExecuted = true;
-            Debug.Log($"创建原子 {element.name}，ID: {createdAtom?.GetInstanceID()}");
+            //Debug.Log($"创建原子 {element.name}，ID: {createdAtom?.GetInstanceID()}");
         }
     }
 

@@ -45,6 +45,12 @@ public class InputHandler : MonoBehaviour
     // 预分配 RaycastHit
     private RaycastHit raycastHitCache;
 
+    // 触摸输入状态（桌面版预留，移动端由 MobileInputHandler 处理）
+    private Vector3 touchDragStartWorldPos;
+    private Vector3 touchDragStartAtomPos;
+    private List<GameObject> touchDraggingConnectedAtoms;
+    private Vector3[] touchDraggingOffsets;
+
     private void Awake()
     {
         cachedCamera = Camera.main;
@@ -538,22 +544,22 @@ public class InputHandler : MonoBehaviour
 
         StringBuilder sb = new StringBuilder();
 
-        // 旋转时只显示旋转角度，不显示其他信息
+        // 旋转时只输出角度到 Console，不显示在 UI
         if (isRotating)
         {
             float angle = bondRotator.GetCurrentAngle();
-            string rotationText = LocalizationManager.Instance.GetLocalizedText("rotation_angle");
-            sb.Append(string.Format(rotationText, angle.ToString("F1")));
-            UIManager.Instance.UpdateSelectedInfo(sb.ToString());
+            Debug.Log($"[BondRotator] 旋转角度: {angle:F1}°");
+            // 清空 UI 显示
+            UIManager.Instance.UpdateSelectedInfo("");
             return;
         }
 
-        // 非旋转时，显示选中信息
+        // 非旋转时：选中信息只输出到 Console，不显示在 UI
         if (selectedAtom != null)
         {
             Element element = GetElementFromAtom(selectedAtom);
             string elemName = LocalizationManager.Instance.GetLocalizedText($"element_{element.name.ToLower()}");
-            sb.Append($"{elemName} ({element.symbol})");
+            Debug.Log($"[Selection] 选中原子: {elemName} ({element.symbol})");
         }
 
         if (dashedBondManager.selectedDashedBond != null)
@@ -561,17 +567,14 @@ public class InputHandler : MonoBehaviour
             DashedBondLink link = dashedBondManager.selectedDashedBond.GetComponent<DashedBondLink>();
             if (link != null)
             {
-                string bondTypeText = LocalizationManager.Instance.GetLocalizedText("bond_type_info");
-                sb.Append($" {string.Format(bondTypeText, link.bondType)}");
-
                 string bondType = dashedBondManager.selectedDashedBond.CompareTag("PreservedBond") ?
-                    LocalizationManager.Instance.GetLocalizedText("preserved_bond") :
-                    LocalizationManager.Instance.GetLocalizedText("dashed_bond");
-                sb.Append($" ({bondType})");
+                    "PreservedBond" : "DashedBond";
+                Debug.Log($"[Selection] 选中键: type={link.bondType}, tag={bondType}");
             }
         }
 
-        UIManager.Instance.UpdateSelectedInfo(sb.ToString());
+        // 清空 UI 上的选中信息显示
+        UIManager.Instance.UpdateSelectedInfo("");
     }
 
     public void UIUndo()
